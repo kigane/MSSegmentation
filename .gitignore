@@ -1,3 +1,8 @@
+data
+wandb
+checkpoints
+t.ipynb
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
