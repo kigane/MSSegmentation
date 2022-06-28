@@ -10,10 +10,24 @@ from datasets import get_loader
 from util import DEVICE, check_accuracy, get_avg_dice, parse_args, save_checkpoint, wb_mask, tensor2im
 
 
+def init_weights(m):
+    if isinstance(m, nn.Conv2d):
+        nn.init.kaiming_uniform_(m.weight.data)
+        if m.bias is not None:
+            nn.init.constant_(m.bias.data, 0)
+    elif isinstance(m, nn.BatchNorm2d):
+        nn.init.constant_(m.weight.data, 1)
+        nn.init.constant_(m.bias.data, 0)
+    elif isinstance(m, nn.Linear):
+        nn.init.kaiming_uniform_(m.weight.data)
+        nn.init.constant_(m.bias.data, 0)
+
+
 if __name__ == "__main__":
     args = parse_args()
 
     model = UNET(1, 1, args.features, args.dropout_ratios)
+    model.apply(init_weights)
     model.to(DEVICE)
     loss_fn = DiceBCELoss(args.dice_weight)
     optimizer = optim.Adam(model.parameters(), lr=args.lr,
@@ -48,9 +62,9 @@ if __name__ == "__main__":
             optimizer.step()
             train_losses.append(loss.float())
             mask_list.append(wb_mask(imgs, preds, targets))
-        wandb.log({"predictions": mask_list})
-        pbar.set_postfix_str(f'loss: {sum(train_losses)/len(train_losses):2f}')
-        pbar.set_postfix_str(f'dice: {sum(dice_scores)/len(dice_scores):2f}')
+        print(f'loss: {sum(train_losses)/len(train_losses):2f}')
+        print(f'dice: {sum(dice_scores)/len(dice_scores):2f}')
+        wandb.log({"predictions": mask_list[:16]})
         wandb.log({'train/loss': sum(train_losses)/len(train_losses)})
         wandb.log({'train/dice': sum(dice_scores)/len(dice_scores)})
 

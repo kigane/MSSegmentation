@@ -9,7 +9,7 @@ lr_beta2: 0.999 # adam optimizer's momentum
 
 # -------------------------weights---------------------------
 
-dice_weight: 1.5
+dice_weight: 3
 
 # -------------------------network---------------------------
 

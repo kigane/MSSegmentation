@@ -7,5 +7,5 @@ notes: dummy
 base_dir: ./data/isbi2015/
 mri_type: flair
 checkpoints: checkpoints
-batch_size: 16
-num_workers: 0
+batch_size: 8
+num_workers: 4
