@@ -1,4 +1,3 @@
-from tkinter.messagebox import NO
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader, random_split
 import torchvision.transforms as tf
@@ -23,7 +22,7 @@ class MSDataset(Dataset):
         return img, mask
 
 
-def get_loder(mri_path, mask_path, batch_size=16, num_workers=0, shuffle=True, transform=None):
+def get_loader(mri_path, mask_path, batch_size=16, num_workers=0, shuffle=True, transform=None):
     dataset = MSDataset(mri_path, mask_path, transform)
     train_len = int(len(dataset) * 0.8)
     train, val = random_split(dataset, [train_len, len(dataset) - train_len])
@@ -33,6 +32,12 @@ def get_loder(mri_path, mask_path, batch_size=16, num_workers=0, shuffle=True, t
     val_loader = DataLoader(val, batch_size, shuffle=shuffle,
                             num_workers=num_workers, pin_memory=True)
     return train_loader, val_loader
+
+
+def get_test_loader(mri_path, mask_path, batch_size=16, num_workers=0, shuffle=True, transform=None):
+    dataset = MSDataset(mri_path, mask_path, transform)
+    return DataLoader(dataset, batch_size, shuffle=shuffle,
+                      num_workers=num_workers, pin_memory=True)
 
 
 if __name__ == '__main__':
@@ -45,10 +50,10 @@ if __name__ == '__main__':
     # d = MSDataset('./data/isbi2015/flair_train.npy',
     #               './data/isbi2015/mask_train.npy',)
 
-    t, v = get_loder('./data/isbi2015/flair_train.npy',
-                     './data/isbi2015/mask_train.npy',
-                     batch_size=4,
-                     transform=trans)
+    t, v = get_loader('./data/isbi2015/flair_train.npy',
+                      './data/isbi2015/mask_train.npy',
+                      batch_size=4,
+                      transform=trans)
 
     it = iter(t)
     X, Y = next(it)

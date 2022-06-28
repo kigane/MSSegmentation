@@ -6,8 +6,8 @@ import torch.optim as optim
 import wandb
 from model import UNET
 from losses import DiceBCELoss
-from datasets import get_loder
-from util import DEVICE, check_accuracy, parse_args, save_checkpoint
+from datasets import get_loader
+from util import DEVICE, check_accuracy, get_avg_dice, parse_args, save_checkpoint, wb_mask, tensor2im
 
 
 if __name__ == "__main__":
@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     mri_path = os.path.join(args.base_dir, args.mri_type + '_train.npy')
     mask_path = os.path.join(args.base_dir, 'mask_train.npy')
-    train_loader, val_loader = get_loder(
+    train_loader, val_loader = get_loader(
         mri_path, mask_path,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
@@ -31,6 +31,9 @@ if __name__ == "__main__":
     for epoch in range(args.num_epochs):
         pbar = tqdm(train_loader)
         pbar.set_description(f'epoch {epoch}')
+        train_losses = []
+        dice_scores = []
+        mask_list = []
         for batch_index, (imgs, targets) in enumerate(pbar):
             imgs = imgs.to(DEVICE)  # [NCHW]
             targets = targets.to(DEVICE)  # [N1HW]
@@ -38,13 +41,18 @@ if __name__ == "__main__":
                 print(f'imgs shape: {imgs.shape}')
                 print(f'targets shape: {targets.shape}')
             preds = model(imgs)
-
+            dice_scores.append(get_avg_dice(preds, targets))
             optimizer.zero_grad()
             loss = loss_fn(preds, targets)
             loss.backward()
             optimizer.step()
-            pbar.set_postfix_str(f'loss: {loss.float():2f}')
-            wandb.log({'train/loss': loss.float()})
+            train_losses.append(loss.float())
+            mask_list.append(wb_mask(imgs, preds, targets))
+        wandb.log({"predictions": mask_list})
+        pbar.set_postfix_str(f'loss: {sum(train_losses)/len(train_losses):2f}')
+        pbar.set_postfix_str(f'dice: {sum(dice_scores)/len(dice_scores):2f}')
+        wandb.log({'train/loss': sum(train_losses)/len(train_losses)})
+        wandb.log({'train/dice': sum(dice_scores)/len(dice_scores)})
 
         # save model
         checkpoint = {
@@ -59,6 +67,6 @@ if __name__ == "__main__":
         acc, dice = check_accuracy(val_loader, model, device=DEVICE)
 
         wandb.log({
-            'train/acc': acc,
-            'train/dice': dice
+            'val/acc': acc,
+            'val/dice': dice
         })
