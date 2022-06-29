@@ -71,9 +71,11 @@ if __name__ == "__main__":
             mask_list.append(wb_mask(imgs, preds, targets))
         print(f'loss: {sum(train_losses)/len(train_losses):2f}')
         print(f'dice: {sum(dice_scores)/len(dice_scores):2f}')
-        wandb.log({"predictions": mask_list[:16]})
-        wandb.log({'train/loss': sum(train_losses)/len(train_losses)})
-        wandb.log({'train/dice': sum(dice_scores)/len(dice_scores)})
+        wandb.log({"predictions": mask_list[:6]}, step=epoch+1)
+        wandb.log({'train/loss': sum(train_losses) /
+                  len(train_losses)}, step=epoch+1)
+        wandb.log({'train/dice': sum(dice_scores) /
+                  len(dice_scores)}, step=epoch+1)
 
         # save model
         checkpoint = {
@@ -82,7 +84,7 @@ if __name__ == "__main__":
         }
 
         save_checkpoint(checkpoint, os.path.join(
-            args.checkpoints, args.mri_type)+'.pth')
+            args.checkpoints, args.mri_type)+f'_{args.model}.pth')
 
         # check accuracy
         acc, dice = check_accuracy(val_loader, model, device=DEVICE)
@@ -90,4 +92,4 @@ if __name__ == "__main__":
         wandb.log({
             'val/acc': acc,
             'val/dice': dice
-        })
+        }, step=epoch+1)
