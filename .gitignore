@@ -2,6 +2,7 @@ data
 wandb
 checkpoints
 t.ipynb
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

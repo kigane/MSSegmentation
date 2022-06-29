@@ -1,3 +1,4 @@
+model: unet # unet | atten-unet
 num_epochs: 200 # total iteration steps
 
 # -------------------------optimizer---------------------------

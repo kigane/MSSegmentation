@@ -4,7 +4,7 @@ from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
 import wandb
-from model import UNET
+from model import UNET, AttenUNET
 from losses import DiceBCELoss
 from datasets import get_loader
 from util import DEVICE, check_accuracy, get_avg_dice, parse_args, save_checkpoint, wb_mask, tensor2im
@@ -25,8 +25,13 @@ def init_weights(m):
 
 if __name__ == "__main__":
     args = parse_args()
+    if args.model == 'unet':
+        model = UNET(1, 1, args.features, args.dropout_ratios)
+    elif args.model == 'atten-unet':
+        model = AttenUNET(1, 1, args.features, args.dropout_ratios)
+    else:
+        raise NotImplementedError(f'{args.model} is not implemented')
 
-    model = UNET(1, 1, args.features, args.dropout_ratios)
     model.apply(init_weights)
     model.to(DEVICE)
     loss_fn = DiceBCELoss(args.dice_weight)
