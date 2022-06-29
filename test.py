@@ -64,5 +64,5 @@ if __name__ == '__main__':
     df_train = pd.DataFrame(metrics, columns=METRICS)
     # df_train.to_csv('result_train.csv')
     pd.concat([df_train.mean(), df_train.std()], axis=1).T.to_csv(
-        'result/test_mean_std.csv')
+        'result/train_mean_std.csv')
     print(df_train.describe())
