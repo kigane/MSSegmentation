@@ -26,9 +26,11 @@ def init_weights(m):
 if __name__ == "__main__":
     args = parse_args()
     if args.model == 'unet':
-        model = UNET(1, 1, args.features, args.dropout_ratios)
+        model = UNET(1, 1, args.features,
+                     args.dropout_ratios, use_bn=args.use_bn)
     elif args.model == 'atten-unet':
-        model = AttenUNET(1, 1, args.features, args.dropout_ratios)
+        model = AttenUNET(1, 1, args.features,
+                          args.dropout_ratios, use_bn=args.use_bn)
     else:
         raise NotImplementedError(f'{args.model} is not implemented')
 

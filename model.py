@@ -56,7 +56,8 @@ class UNET(nn.Module):
         in_channels=3,
         out_channels=1,
         features=[16, 32, 64, 128],
-        dropout_ratios=[0.5] * 5
+        dropout_ratios=[0.5] * 5,
+        use_bn=False
     ):
         super(UNET, self).__init__()
         self.ups = nn.ModuleList()
@@ -68,7 +69,7 @@ class UNET(nn.Module):
         # Down part of UNET
         for feature, p in zip(features, dropouts):
             self.downs.append(DoubleConv(
-                in_channels, feature, dropout_ratio=p))
+                in_channels, feature, dropout_ratio=p, use_bn=use_bn))
             in_channels = feature
 
         # Up part of UNET
@@ -81,10 +82,11 @@ class UNET(nn.Module):
                     stride=2,
                 )
             )
-            self.ups.append(DoubleConv(feature * 2, feature, dropout_ratio=p))
+            self.ups.append(DoubleConv(feature * 2, feature,
+                            dropout_ratio=p, use_bn=use_bn))
 
         self.bottleneck = DoubleConv(
-            features[-1], features[-1] * 2, dropout_ratio=bottleneck_p)
+            features[-1], features[-1] * 2, dropout_ratio=bottleneck_p, use_bn=use_bn)
         self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1)
         self.sigmoid = nn.Sigmoid()
 
@@ -118,7 +120,8 @@ class AttenUNET(nn.Module):
         in_channels=3,
         out_channels=1,
         features=[16, 32, 64, 128],
-        dropout_ratios=[0.5] * 5
+        dropout_ratios=[0.5] * 5,
+        use_bn=False
     ):
         super(AttenUNET, self).__init__()
         self.ups = nn.ModuleList()
@@ -144,10 +147,11 @@ class AttenUNET(nn.Module):
                 )
             )
             self.ups.append(AttentionBlock(feature))
-            self.ups.append(DoubleConv(feature * 2, feature, dropout_ratio=p))
+            self.ups.append(DoubleConv(feature * 2, feature,
+                            dropout_ratio=p, use_bn=use_bn))
 
         self.bottleneck = DoubleConv(
-            features[-1], features[-1] * 2, dropout_ratio=bottleneck_p)
+            features[-1], features[-1] * 2, dropout_ratio=bottleneck_p, use_bn=use_bn)
         self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1)
         self.sigmoid = nn.Sigmoid()
 
