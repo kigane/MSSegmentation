@@ -48,6 +48,8 @@ if __name__ == '__main__':
 
     df_test = pd.DataFrame(metrics, columns=METRICS)
     # df_test.to_csv('result_test.csv')
+    pd.concat([df_test.mean(), df_test.std()], axis=1).T.to_csv(
+        'result/test_mean_std.csv')
     print(df_test.describe())
 
     metrics = []
@@ -61,4 +63,6 @@ if __name__ == '__main__':
 
     df_train = pd.DataFrame(metrics, columns=METRICS)
     # df_train.to_csv('result_train.csv')
+    pd.concat([df_train.mean(), df_train.std()], axis=1).T.to_csv(
+        'result/test_mean_std.csv')
     print(df_train.describe())
