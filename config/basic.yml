@@ -1,8 +1,6 @@
 use_wandb: true # if true, use wandb for recording
 project: MSSegmentation # wandb project name
-group: Base # a filter
-# notes will show in wandb
-notes: dummy
+
 
 base_dir: ./data/isbi2015/
 mri_type: flair
