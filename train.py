@@ -34,12 +34,6 @@ if __name__ == "__main__":
     else:
         raise NotImplementedError(f'{args.model} is not implemented')
 
-    model.apply(init_weights)
-    model.to(DEVICE)
-    loss_fn = DiceBCELoss(args.dice_weight)
-    optimizer = optim.Adam(model.parameters(), lr=args.lr,
-                           betas=(args.lr_beta1, args.lr_beta2))
-
     mri_path = os.path.join(args.base_dir, args.mri_type + '_train.npy')
     mask_path = os.path.join(args.base_dir, 'mask_train.npy')
     train_loader, val_loader = get_loader(
@@ -49,7 +43,16 @@ if __name__ == "__main__":
         shuffle=True
     )
 
-    for epoch in range(args.num_epochs):
+    model.apply(init_weights)
+    model.to(DEVICE)
+    loss_fn = DiceBCELoss(args.dice_weight)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr,
+                           betas=(args.lr_beta1, args.lr_beta2))
+    scheduler = optim.lr_scheduler.StepLR(
+        optimizer, step_size=len(train_loader) * 50, gamma=0.1)
+
+    obar = tqdm(range(args.num_epochs))
+    for epoch in obar:
         pbar = tqdm(train_loader)
         pbar.set_description(f'epoch {epoch}')
         train_losses = []
@@ -67,10 +70,10 @@ if __name__ == "__main__":
             loss = loss_fn(preds, targets)
             loss.backward()
             optimizer.step()
+            scheduler.step()
             train_losses.append(loss.float())
             mask_list.append(wb_mask(imgs, preds, targets))
-        print(f'loss: {sum(train_losses)/len(train_losses):2f}')
-        print(f'dice: {sum(dice_scores)/len(dice_scores):2f}')
+
         wandb.log({"predictions": mask_list[:6]}, step=epoch+1)
         wandb.log({'train/loss': sum(train_losses) /
                   len(train_losses)}, step=epoch+1)
@@ -93,3 +96,6 @@ if __name__ == "__main__":
             'val/acc': acc,
             'val/dice': dice
         }, step=epoch+1)
+
+        obar.set_description(
+            f"lr: {optimizer.param_groups[0]['lr']} train/loss: {sum(train_losses)/len(train_losses):2f}, train/dice: {sum(dice_scores)/len(dice_scores):2f}, val/acc: {acc*100:.2f}, val/dice: {dice}")

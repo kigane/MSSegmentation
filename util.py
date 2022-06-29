@@ -120,10 +120,10 @@ def check_accuracy(loader, model, device="cuda"):
                 (preds + y).sum() + 1e-8
             )
 
-    print(
-        f"Got {num_correct}/{num_pixels} with acc {num_correct/num_pixels*100:.2f}"
-    )
-    print(f"Dice score: {dice_score/len(loader)}")
+    # print(
+    #     f"Got {num_correct}/{num_pixels} with acc {num_correct/num_pixels*100:.2f}"
+    # )
+    # print(f"Dice score: {dice_score/len(loader)}")
     model.train()
 
     return num_correct/num_pixels, dice_score/len(loader)
