@@ -133,7 +133,7 @@ class AttenUNET(nn.Module):
         # Down part of UNET
         for feature, p in zip(features, dropouts):
             self.downs.append(DoubleConv(
-                in_channels, feature, dropout_ratio=p))
+                in_channels, feature, dropout_ratio=p, use_bn=use_bn))
             in_channels = feature
 
         # Up part of UNET

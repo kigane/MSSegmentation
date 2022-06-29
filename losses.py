@@ -7,7 +7,7 @@ class DiceBCELoss(nn.Module):
         super(DiceBCELoss, self).__init__()
         self.dice_weight = dice_weight
 
-    def forward(self, inputs, targets, smooth=1):
+    def forward(self, inputs, targets, smooth=1e-5):
         # flatten label and prediction tensors
         inputs = inputs.view(-1)
         targets = targets.view(-1)
