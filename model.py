@@ -5,8 +5,28 @@ import torch.nn.functional as F
 import torchvision.transforms.functional as TF
 
 
+def get_activation(act):
+    if act == 'elu':
+        activation = nn.ELU()
+    elif act == 'relu':
+        activation = nn.ReLU()
+    elif act == 'lrelu':
+        activation = nn.LeakyReLU(0.1)
+    else:
+        raise NotImplementedError(f'{act} is not supported yet')
+    return activation
+
+
 class DoubleConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size=3, dropout_ratio=0.5, use_bn=False):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        kernel_size=3,
+        dropout_ratio=0.5,
+        use_bn=False,
+        act='elu'
+    ):
         super(DoubleConv, self).__init__()
         mlist = []
         mlist.append(
@@ -16,7 +36,7 @@ class DoubleConv(nn.Module):
         )
         if use_bn:
             mlist.append(nn.BatchNorm2d(out_channels))
-        mlist.append(nn.ELU())
+        mlist.append(get_activation(act))
         mlist.append(nn.Dropout(dropout_ratio))
         mlist.append(
             nn.Conv2d(
@@ -25,7 +45,7 @@ class DoubleConv(nn.Module):
         )
         if use_bn:
             mlist.append(nn.BatchNorm2d(out_channels))
-        mlist.append(nn.ELU())
+        mlist.append(get_activation(act))
         self.conv = nn.Sequential(*mlist)
 
     def forward(self, x):
@@ -57,7 +77,8 @@ class UNET(nn.Module):
         out_channels=1,
         features=[16, 32, 64, 128],
         dropout_ratios=[0.5] * 5,
-        use_bn=False
+        use_bn=False,
+        act='elu'
     ):
         super(UNET, self).__init__()
         self.ups = nn.ModuleList()
@@ -69,7 +90,7 @@ class UNET(nn.Module):
         # Down part of UNET
         for feature, p in zip(features, dropouts):
             self.downs.append(DoubleConv(
-                in_channels, feature, dropout_ratio=p, use_bn=use_bn))
+                in_channels, feature, dropout_ratio=p, use_bn=use_bn, act=act))
             in_channels = feature
 
         # Up part of UNET
@@ -83,10 +104,10 @@ class UNET(nn.Module):
                 )
             )
             self.ups.append(DoubleConv(feature * 2, feature,
-                            dropout_ratio=p, use_bn=use_bn))
+                            dropout_ratio=p, use_bn=use_bn, act=act))
 
         self.bottleneck = DoubleConv(
-            features[-1], features[-1] * 2, dropout_ratio=bottleneck_p, use_bn=use_bn)
+            features[-1], features[-1] * 2, dropout_ratio=bottleneck_p, use_bn=use_bn, act=act)
         self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1)
         self.sigmoid = nn.Sigmoid()
 
@@ -121,7 +142,8 @@ class AttenUNET(nn.Module):
         out_channels=1,
         features=[16, 32, 64, 128],
         dropout_ratios=[0.5] * 5,
-        use_bn=False
+        use_bn=False,
+        act='elu'
     ):
         super(AttenUNET, self).__init__()
         self.ups = nn.ModuleList()
@@ -133,7 +155,7 @@ class AttenUNET(nn.Module):
         # Down part of UNET
         for feature, p in zip(features, dropouts):
             self.downs.append(DoubleConv(
-                in_channels, feature, dropout_ratio=p, use_bn=use_bn))
+                in_channels, feature, dropout_ratio=p, use_bn=use_bn, act=act))
             in_channels = feature
 
         # Up part of UNET
@@ -148,10 +170,10 @@ class AttenUNET(nn.Module):
             )
             self.ups.append(AttentionBlock(feature))
             self.ups.append(DoubleConv(feature * 2, feature,
-                            dropout_ratio=p, use_bn=use_bn))
+                            dropout_ratio=p, use_bn=use_bn, act=act))
 
         self.bottleneck = DoubleConv(
-            features[-1], features[-1] * 2, dropout_ratio=bottleneck_p, use_bn=use_bn)
+            features[-1], features[-1] * 2, dropout_ratio=bottleneck_p, use_bn=use_bn, act=act)
         self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1)
         self.sigmoid = nn.Sigmoid()
 

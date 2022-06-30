@@ -10,6 +10,14 @@ from datasets import get_loader
 from util import DEVICE, check_accuracy, get_avg_dice, parse_args, save_checkpoint, wb_mask, tensor2im
 
 
+def get_scheduler(optimizer, num_batches, args):
+    if args.lr_policy == 'step':
+        scheduler = optim.lr_scheduler.StepLR(
+            optimizer, step_size=num_batches * args.lr_decay_freq, gamma=args.gamma)
+
+    return scheduler
+
+
 def init_weights(m):
     if isinstance(m, nn.Conv2d):
         nn.init.kaiming_normal_(m.weight.data)
@@ -27,10 +35,10 @@ if __name__ == "__main__":
     args = parse_args()
     if args.model == 'unet':
         model = UNET(1, 1, args.features,
-                     args.dropout_ratios, use_bn=args.use_bn)
+                     args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
     elif args.model == 'atten-unet':
         model = AttenUNET(1, 1, args.features,
-                          args.dropout_ratios, use_bn=args.use_bn)
+                          args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
     else:
         raise NotImplementedError(f'{args.model} is not implemented')
 
