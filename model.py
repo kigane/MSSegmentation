@@ -55,19 +55,23 @@ class DoubleConv(nn.Module):
 class AttentionBlock(nn.Module):
     def __init__(self, chs) -> None:
         super().__init__()
-        self.conv1 = nn.Conv2d(chs, chs, 1, 1)
-        self.conv2 = nn.Conv2d(chs, chs, 1, 1)
+        self.conv1 = nn.Conv2d(2*chs, chs, 1, 1)
+        self.conv2 = nn.Conv2d(chs, chs, 2, 2)
         self.conv3 = nn.Conv2d(chs, 1, 1, 1)
+        self.W = nn.Conv2d(chs, chs, 1, 1)
         self.norm = nn.BatchNorm2d(chs)
-        self.norm1 = nn.BatchNorm2d(1)
+        # self.norm1 = nn.BatchNorm2d(1)
 
-    def forward(self, x, shortcut):
-        g = self.norm(self.conv1(shortcut))
-        x = self.norm(self.conv2(x))
-        psi = F.elu(g+x)
-        psi = self.norm1(self.conv3(psi))
+    def forward(self, g, x):
+        # g: deeper feature
+        # x: shortcut
+        phi = self.conv1(g)
+        theta = self.conv2(x)
+        psi = F.relu(theta+phi)
+        psi = self.conv3(psi)
         psi = torch.sigmoid(psi)
-        return torch.matmul(x, psi)
+        psi = F.interpolate(psi, x.size()[2:], mode='bilinear')
+        return self.norm(self.W(torch.matmul(x, psi)))
 
 
 class UNET(nn.Module):
@@ -189,13 +193,13 @@ class AttenUNET(nn.Module):
         skip_connections = skip_connections[::-1]
 
         for idx in range(0, len(self.ups), 3):
-            x = self.ups[idx](x)
             skip_connection = skip_connections[idx // 3]
+            atten = self.ups[idx + 1](x, skip_connection)
+            x = self.ups[idx](x)
 
             if x.shape != skip_connection.shape:
                 x = TF.resize(x, size=skip_connection.shape[2:])
 
-            atten = self.ups[idx + 1](x, skip_connection)
             concat_skip = torch.cat((x, atten), dim=1)
             x = self.ups[idx + 2](concat_skip)
 

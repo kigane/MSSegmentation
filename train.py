@@ -82,7 +82,7 @@ if __name__ == "__main__":
             train_losses.append(loss.float())
             mask_list.append(wb_mask(imgs, (preds > 0.5).float(), targets))
 
-        wandb.log({"predictions": mask_list[:6]}, step=epoch+1)
+        wandb.log({"predictions": mask_list[:9]}, step=epoch+1)
         wandb.log({'train/loss': sum(train_losses) /
                   len(train_losses)}, step=epoch+1)
         wandb.log({'train/dice': sum(dice_scores) /
