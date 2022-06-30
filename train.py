@@ -98,4 +98,4 @@ if __name__ == "__main__":
         }, step=epoch+1)
 
         obar.set_description(
-            f"lr: {optimizer.param_groups[0]['lr']} train/loss: {sum(train_losses)/len(train_losses):2f}, train/dice: {sum(dice_scores)/len(dice_scores):2f}, val/acc: {acc*100:.2f}, val/dice: {dice:2f}")
+            f"lr: {optimizer.param_groups[0]['lr']} train/loss: {sum(train_losses)/len(train_losses):.4f}, train/dice: {sum(dice_scores)/len(dice_scores):.4f}, val/acc: {acc*100:.2f}, val/dice: {dice:.4f}")
