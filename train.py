@@ -49,11 +49,11 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=args.lr,
                            betas=(args.lr_beta1, args.lr_beta2))
     scheduler = optim.lr_scheduler.StepLR(
-        optimizer, step_size=len(train_loader) * 50, gamma=0.1)
+        optimizer, step_size=len(train_loader) * 50, gamma=0.2)
 
     obar = tqdm(range(args.num_epochs))
     for epoch in obar:
-        pbar = tqdm(train_loader)
+        pbar = tqdm(train_loader, leave=False)
         pbar.set_description(f'epoch {epoch}')
         train_losses = []
         dice_scores = []
@@ -72,7 +72,7 @@ if __name__ == "__main__":
             optimizer.step()
             scheduler.step()
             train_losses.append(loss.float())
-            mask_list.append(wb_mask(imgs, preds, targets))
+            mask_list.append(wb_mask(imgs, (preds > 0.5).float(), targets))
 
         wandb.log({"predictions": mask_list[:6]}, step=epoch+1)
         wandb.log({'train/loss': sum(train_losses) /

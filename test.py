@@ -13,8 +13,9 @@ from util import DEVICE, METRICS, calc_metrics, load_checkpoint, calc_metrics, g
 
 
 if __name__ == '__main__':
-    model = UNET(1, 1, [16, 32, 64, 128], [0.1, 0.1, 0.2, 0.2, 0.3])
-    load_checkpoint('checkpoints/flair.pth', model)
+    model = UNET(1, 1, [16, 32, 64, 128], [
+                 0.1, 0.1, 0.2, 0.2, 0.3], use_bn=True)
+    load_checkpoint('checkpoints/flair_unet.pth', model)
     model.to(DEVICE)
     model.eval()
 
