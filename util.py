@@ -57,7 +57,7 @@ def check_folder(log_dir):
 
 
 def save_checkpoint(state, filename="my_checkpoint.pth.tar"):
-    print("=> Saving checkpoint")
+    # print("=> Saving checkpoint")
     torch.save(state, filename)
 
 
