@@ -45,7 +45,7 @@ if __name__ == '__main__':
         save = make_grid(
             torch.cat([imgs, preds_t, gts], dim=0), pad_value=255, nrow=3)
         cv.imwrite(f'./result/test/pred_{n}.png',
-                   save.permute(1, 2, 0).numpy() * 255.0)
+                   save.permute(1, 2, 0).cpu().numpy() * 255.0)
 
     df_test = pd.DataFrame(metrics, columns=METRICS)
     # df_test.to_csv('result_test.csv')
