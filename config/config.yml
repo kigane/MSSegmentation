@@ -17,7 +17,7 @@ activation: elu
 # -------------------------optimizer---------------------------
 
 lr_policy: step # linear | step | cosine
-lr_decay_freq: 50
+lr_decay_freq: 100
 gamma: 0.2
 lr: 0.005 # The learning rate of initialization
 lr_beta1: 0.9 # adam optimizer's momentum
@@ -25,4 +25,4 @@ lr_beta2: 0.999 # adam optimizer's momentum
 
 # -------------------------weights---------------------------
 
-dice_weight: 3
+dice_weight: 1.5

@@ -14,7 +14,8 @@ def get_scheduler(optimizer, num_batches, args):
     if args.lr_policy == 'step':
         scheduler = optim.lr_scheduler.StepLR(
             optimizer, step_size=num_batches * args.lr_decay_freq, gamma=args.gamma)
-
+    else:
+        scheduler = None
     return scheduler
 
 
@@ -56,8 +57,7 @@ if __name__ == "__main__":
     loss_fn = DiceBCELoss(args.dice_weight)
     optimizer = optim.Adam(model.parameters(), lr=args.lr,
                            betas=(args.lr_beta1, args.lr_beta2))
-    scheduler = optim.lr_scheduler.StepLR(
-        optimizer, step_size=len(train_loader) * 50, gamma=0.2)
+    scheduler = get_scheduler(optimizer, len(train_loader), args)
 
     obar = tqdm(range(args.num_epochs))
     for epoch in obar:
@@ -78,7 +78,8 @@ if __name__ == "__main__":
             loss = loss_fn(preds, targets)
             loss.backward()
             optimizer.step()
-            scheduler.step()
+            if scheduler is not None:
+                scheduler.step()
             train_losses.append(loss.float())
             mask_list.append(wb_mask(imgs, (preds > 0.5).float(), targets))
 
