@@ -5,6 +5,8 @@ notes: dummy
 
 # -------------------------model-------------------------------
 
+batch_size: 32
+mri_type: flair
 model: unet # unet | atten-unet
 num_epochs: 300 # total iteration steps
 img_ch: 1 # The size of image channel
@@ -16,7 +18,7 @@ activation: elu
 
 # -------------------------optimizer---------------------------
 
-lr_policy: step # linear | step | cosine
+lr_policy: cosine # linear | step | cosine
 lr_decay_freq: 100
 gamma: 0.2
 lr: 0.005 # The learning rate of initialization

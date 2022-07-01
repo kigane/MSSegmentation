@@ -2,8 +2,6 @@ use_wandb: true # if true, use wandb for recording
 project: MSSegmentation # wandb project name
 
 base_dir: ./data/isbi2015/
-mri_type: flair
 checkpoints: checkpoints
-batch_size: 8
-num_workers: 4
+num_workers: 8
 save_freq: 20
