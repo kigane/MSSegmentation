@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 import wandb
 from model import UNET, AttenUNET
-from losses import DiceBCELoss
+from losses import DiceBCELoss, FocalDiceBCELoss
 from datasets import get_loader
 from util import DEVICE, check_accuracy, get_avg_dice, parse_args, save_checkpoint, wb_mask, tensor2im
 
@@ -86,20 +86,20 @@ if __name__ == "__main__":
             train_losses.append(loss.float())
             mask_list.append(wb_mask(imgs, (preds > 0.5).float(), targets))
 
-        wandb.log({"predictions": mask_list[:9]}, step=epoch+1)
         wandb.log({'train/loss': sum(train_losses) /
                   len(train_losses)}, step=epoch+1)
         wandb.log({'train/dice': sum(dice_scores) /
                   len(dice_scores)}, step=epoch+1)
 
-        # save model
-        checkpoint = {
-            "state_dict": model.state_dict(),
-            "optimizer": optimizer.state_dict(),
-        }
-
-        save_checkpoint(checkpoint, os.path.join(
-            args.checkpoints, args.mri_type)+f'_{args.model}.pth')
+        if (epoch+1) % args.save_freq == 0:
+            wandb.log({"predictions": mask_list[:12]}, step=epoch+1)
+            # save model
+            checkpoint = {
+                "state_dict": model.state_dict(),
+                "optimizer": optimizer.state_dict(),
+            }
+            save_checkpoint(checkpoint, os.path.join(
+                args.checkpoints, args.mri_type)+f'_{args.model}.pth')
 
         # check accuracy
         acc, dice = check_accuracy(val_loader, model, device=DEVICE)
