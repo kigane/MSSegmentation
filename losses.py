@@ -40,8 +40,9 @@ class FocalDiceBCELoss(nn.Module):
         BCE = F.binary_cross_entropy(
             inputs, targets.float(), reduction='none')  # -logp
         p = torch.exp(-BCE)
-        alpha_lst = torch.tensor([1-self.alpha, self.alpha])
-        alpha = alpha_lst[targets.data.view(-1)]
+        alpha_lst = torch.tensor(
+            [1-self.alpha, self.alpha], device=inputs.device)
+        alpha = alpha_lst[targets.data.view(-1).long()]
         loss = alpha * (1-p)**self.gamma * BCE
         Dice_BCE = loss.mean() + self.dice_weight * dice_loss
 

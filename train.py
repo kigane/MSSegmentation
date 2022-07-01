@@ -14,6 +14,9 @@ def get_scheduler(optimizer, num_batches, args):
     if args.lr_policy == 'step':
         scheduler = optim.lr_scheduler.StepLR(
             optimizer, step_size=num_batches * args.lr_decay_freq, gamma=args.gamma)
+    elif args.lr_policy == 'cosine':
+        scheduler = optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=num_batches * args.num_epochs, eta_min=1e-6)
     else:
         scheduler = None
     return scheduler
