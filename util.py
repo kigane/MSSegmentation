@@ -7,6 +7,7 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from torchmetrics.functional import confusion_matrix
+from torchvision.utils import make_grid
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 METRICS = ['DSC', 'Sensitivity', 'Specificity', 'IOU',
@@ -161,7 +162,10 @@ def get_avg_dice(preds, gts, threshold=0.5):
 
 
 def wb_mask(bg_img, pred_mask, true_mask):
-    bg_img = bg_img.detach().cpu().numpy()[0].squeeze()
+    bg_img = bg_img.detach().cpu()[0].squeeze()
+    if bg_img.shape[0] == 2:
+        bg_img = bg_img[0]
+    bg_img = bg_img.numpy()
     pred_mask = pred_mask.detach().cpu().numpy()[0].squeeze()
     true_mask = true_mask.detach().cpu().numpy()[0].squeeze()
     return wandb.Image(bg_img, masks={
