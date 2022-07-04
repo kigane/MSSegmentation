@@ -19,17 +19,23 @@ def extract_pngs_from_nii(file, dst_dir, prefix):
 
 
 if __name__ == "__main__":
-
-    patients = [d for d in os.listdir(".") if os.path.isdir(d) and "training" in d]
+    # trainingxx
+    patients = [d for d in os.listdir(
+        ".") if os.path.isdir(d) and "training" in d]
 
     for p in patients:
-        mask1s = [f for f in os.listdir(os.path.join(p, "masks")) if "mask1" in f]
-        mask2s = [f for f in os.listdir(os.path.join(p, "masks")) if "mask2" in f]
+        # xx.nii | xx.nii.gz
+        mask1s = [f for f in os.listdir(
+            os.path.join(p, "masks")) if "mask1" in f]
+        mask2s = [f for f in os.listdir(
+            os.path.join(p, "masks")) if "mask2" in f]
         flairs = [
             f for f in os.listdir(os.path.join(p, "preprocessed")) if "flair" in f
         ]
-        t2s = [f for f in os.listdir(os.path.join(p, "preprocessed")) if "t2" in f]
-        pds = [f for f in os.listdir(os.path.join(p, "preprocessed")) if "pd" in f]
+        t2s = [f for f in os.listdir(
+            os.path.join(p, "preprocessed")) if "t2" in f]
+        pds = [f for f in os.listdir(
+            os.path.join(p, "preprocessed")) if "pd" in f]
         mprages = [
             f for f in os.listdir(os.path.join(p, "preprocessed")) if "mprage" in f
         ]

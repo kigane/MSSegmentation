@@ -23,7 +23,6 @@ MASK_TEST = "./data/isbi2015/masks/test/"
 
 def filter_black_imgs(ids, name):
     Y = np.zeros((len(ids), IMG_HEIGHT, IMG_WIDTH, 1))
-    # 1237 is number of masks that are not total black and have some information to be learned
     n = -1
     d = 0
     index_ = []

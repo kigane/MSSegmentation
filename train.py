@@ -39,10 +39,10 @@ def init_weights(m):
 if __name__ == "__main__":
     args = parse_args()
     if args.model == 'unet':
-        model = UNET(1, 1, args.features,
+        model = UNET(2, 1, args.features,
                      args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
     elif args.model == 'atten-unet':
-        model = AttenUNET(1, 1, args.features,
+        model = AttenUNET(2, 1, args.features,
                           args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
     elif args.model == 'munet':
         model = MUNET(1, 1, args.features,
@@ -59,7 +59,8 @@ if __name__ == "__main__":
         mri_path, mask_path,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
-        shuffle=True
+        shuffle=True,
+        mri_path2=os.path.join(args.base_dir, args.mri_type2 + '_train.npy')
     )
 
     model.apply(init_weights)

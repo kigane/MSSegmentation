@@ -7,6 +7,7 @@ notes: dummy
 
 batch_size: 32
 mri_type: flair
+mri_type2: t2
 model: unet # unet | atten-unet
 num_epochs: 300 # total iteration steps
 img_ch: 1 # The size of image channel
