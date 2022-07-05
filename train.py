@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 import wandb
 from model import UNET, AttenUNET
-from model_maunet import MAUNET, MUNET
+from model_maunet import MAUNET, MUNET, RMUNET
 from losses import DiceBCELoss, FocalDiceBCELoss
 from datasets import get_loader
 from util import DEVICE, check_accuracy, get_avg_dice, parse_args, save_checkpoint, wb_mask, tensor2im
@@ -47,6 +47,9 @@ if __name__ == "__main__":
     elif args.model == 'munet':
         model = MUNET(1, 1, args.features,
                       args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
+    elif args.model == 'rmunet':
+        model = RMUNET(1, 1, args.features,
+                       args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
     elif args.model == 'maunet':
         model = MAUNET(1, 1, args.features,
                        args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
