@@ -40,14 +40,11 @@ if __name__ == "__main__":
 
     model = get_model(args)
 
-    mri_path = os.path.join(args.base_dir, args.mri_type + '_train.npy')
-    mask_path = os.path.join(args.base_dir, 'mask_train.npy')
     train_loader, val_loader = get_loader(
-        mri_path, mask_path,
+        args.base_dir, args.mri_types,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         shuffle=True,
-        mri_path2=os.path.join(args.base_dir, args.mri_type2 + '_train.npy')
     )
 
     model.apply(init_weights)
@@ -94,7 +91,7 @@ if __name__ == "__main__":
                 "optimizer": optimizer.state_dict(),
             }
             save_checkpoint(checkpoint, os.path.join(
-                args.checkpoints, args.mri_type)+f'_{args.model}.pth')
+                args.checkpoints, args.model_data_type)+f'_{args.model}.pth')
 
         # check accuracy
         acc, dice = check_accuracy(val_loader, model, device=DEVICE)

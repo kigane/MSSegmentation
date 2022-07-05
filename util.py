@@ -177,19 +177,19 @@ def wb_mask(bg_img, pred_mask, true_mask):
 
 def get_model(args):
     if args.model == 'unet':
-        model = UNET(args.mri_types, 1, args.features,
+        model = UNET(len(args.mri_types), 1, args.features,
                      args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
     elif args.model == 'atten-unet':
-        model = AttenUNET(args.mri_types, 1, args.features,
+        model = AttenUNET(len(args.mri_types), 1, args.features,
                           args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
     elif args.model == 'munet':
-        model = MUNET(args.mri_types, 1, args.features,
+        model = MUNET(len(args.mri_types), 1, args.features,
                       args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
     elif args.model == 'rmunet':
-        model = RMUNET(args.mri_types, 1, args.features,
+        model = RMUNET(len(args.mri_types), 1, args.features,
                        args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
     elif args.model == 'maunet':
-        model = MAUNET(args.mri_types, 1, args.features,
+        model = MAUNET(len(args.mri_types), 1, args.features,
                        args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
     else:
         raise NotImplementedError(f'{args.model} is not implemented')

@@ -16,27 +16,21 @@ from util import DEVICE, METRICS, calc_metrics, load_checkpoint, calc_metrics, g
 def test(args):
     model = get_model(args)
     load_checkpoint(os.path.join(
-        args.checkpoints, args.mri_type)+f'_{args.model}.pth', model)
+        args.checkpoints, args.model_data_type)+f'_{args.model}.pth', model)
     model.to(DEVICE)
     model.eval()
 
-    test_mri_path = os.path.join(args.base_dir, args.mri_type + '_test.npy')
-    test_mask_path = os.path.join(args.base_dir, 'mask_test.npy')
-    test_mri_path2 = os.path.join(args.base_dir, args.mri_type2 + '_test.npy')
     test_loader = get_test_loader(
-        test_mri_path,
-        test_mask_path,
+        args.base_dir,
+        args.mri_types,
         batch_size=1,
-        mri_path2=test_mri_path2
     )
-    mri_path = os.path.join(args.base_dir, args.mri_type + '_train.npy')
-    mask_path = os.path.join(args.base_dir, 'mask_train.npy')
-    mri_path2 = os.path.join(args.base_dir, args.mri_type2 + '_train.npy')
+
     train_loader, _ = get_loader(
-        mri_path, mask_path,
+        args.base_dir,
+        args.mri_types,
         batch_size=1,
         num_workers=0,
-        mri_path2=mri_path2
     )
 
     metrics = []
@@ -77,15 +71,16 @@ def test(args):
     # df_train.to_csv('result_train.csv')
     # pd.concat([df_train.mean(), df_train.std()], axis=1).T.to_csv(
     #     'result/train_mean_std.csv')
-    if args.use_wandb:
-        wandb.log({'Result': wandb.Table(dataframe=df_train.describe())})
-    else:
-        print(df_train.describe())
+    # if args.use_wandb:
+    # wandb.log({'Result': wandb.Table(dataframe=df_train.describe())})
+    # else:
+    print(df_train.describe())
 
 
 if __name__ == '__main__':
     args = parse_args()
     args.use_wandb = False
+    print(args)
     test(args)
     # model = UNET(1, 1, [16, 32, 64, 128], [
     #              0.1, 0.1, 0.2, 0.2, 0.3], use_bn=True)
