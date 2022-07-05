@@ -8,6 +8,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from torchmetrics.functional import confusion_matrix
 from torchvision.utils import make_grid
+from model import UNET, AttenUNET
+from model_maunet import MAUNET, MUNET, RMUNET
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 METRICS = ['DSC', 'Sensitivity', 'Specificity', 'IOU',
@@ -171,3 +173,24 @@ def wb_mask(bg_img, pred_mask, true_mask):
     return wandb.Image(bg_img, masks={
         "prediction": {"mask_data": pred_mask, "class_labels": {0: 'background', 1: 'lesions'}},
         "ground truth": {"mask_data": true_mask, "class_labels": {0: 'background', 1: 'lesions'}}})
+
+
+def get_model(args):
+    if args.model == 'unet':
+        model = UNET(args.mri_types, 1, args.features,
+                     args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
+    elif args.model == 'atten-unet':
+        model = AttenUNET(args.mri_types, 1, args.features,
+                          args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
+    elif args.model == 'munet':
+        model = MUNET(args.mri_types, 1, args.features,
+                      args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
+    elif args.model == 'rmunet':
+        model = RMUNET(args.mri_types, 1, args.features,
+                       args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
+    elif args.model == 'maunet':
+        model = MAUNET(args.mri_types, 1, args.features,
+                       args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
+    else:
+        raise NotImplementedError(f'{args.model} is not implemented')
+    return model

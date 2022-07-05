@@ -199,7 +199,8 @@ class RMUNET(nn.Module):
 
         x = self.bottleneck(x)
         skip_connections = skip_connections[::-1]
-        pred_ms = torch.zeros(x.shape[0], 1, 1, 1)
+        pred_ms = torch.zeros(
+            x.shape[0], 1, 1, 1, device='cuda' if torch.cuda.is_available() else 'cpu')
         # pred_ms.append(F.interpolate(
         #     x, shape, mode='bilinear', align_corners=True))
 

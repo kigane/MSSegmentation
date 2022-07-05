@@ -4,11 +4,10 @@ from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
 import wandb
-from model import UNET, AttenUNET
-from model_maunet import MAUNET, MUNET, RMUNET
 from losses import DiceBCELoss, FocalDiceBCELoss
 from datasets import get_loader
-from util import DEVICE, check_accuracy, get_avg_dice, parse_args, save_checkpoint, wb_mask, tensor2im
+import test
+from util import DEVICE, check_accuracy, get_avg_dice, get_model, parse_args, save_checkpoint, wb_mask, tensor2im
 
 
 def get_scheduler(optimizer, num_batches, args):
@@ -38,23 +37,8 @@ def init_weights(m):
 
 if __name__ == "__main__":
     args = parse_args()
-    if args.model == 'unet':
-        model = UNET(2, 1, args.features,
-                     args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
-    elif args.model == 'atten-unet':
-        model = AttenUNET(2, 1, args.features,
-                          args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
-    elif args.model == 'munet':
-        model = MUNET(1, 1, args.features,
-                      args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
-    elif args.model == 'rmunet':
-        model = RMUNET(1, 1, args.features,
-                       args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
-    elif args.model == 'maunet':
-        model = MAUNET(1, 1, args.features,
-                       args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
-    else:
-        raise NotImplementedError(f'{args.model} is not implemented')
+
+    model = get_model(args)
 
     mri_path = os.path.join(args.base_dir, args.mri_type + '_train.npy')
     mask_path = os.path.join(args.base_dir, 'mask_train.npy')
@@ -122,3 +106,5 @@ if __name__ == "__main__":
 
         obar.set_description(
             f"lr: {optimizer.param_groups[0]['lr']} train/loss: {sum(train_losses)/len(train_losses):.4f}, train/dice: {sum(dice_scores)/len(dice_scores):.4f}, val/acc: {acc*100:.2f}, val/dice: {dice:.4f}")
+
+    test.test(args)
