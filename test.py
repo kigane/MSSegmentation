@@ -78,7 +78,7 @@ def test(args):
     # pd.concat([df_train.mean(), df_train.std()], axis=1).T.to_csv(
     #     'result/train_mean_std.csv')
     if args.use_wandb:
-        wandb.log({'Result', wandb.Table(dataframe=df_train.describe())})
+        wandb.log({'Result': wandb.Table(dataframe=df_train.describe())})
     else:
         print(df_train.describe())
 
