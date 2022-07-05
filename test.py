@@ -16,7 +16,7 @@ from util import DEVICE, METRICS, calc_metrics, load_checkpoint, calc_metrics, g
 def test(args):
     model = get_model(args)
     load_checkpoint(os.path.join(
-        args.checkpoints, args.model_data_type)+f'_{args.model}.pth', model)
+        args.checkpoints, '_'.join(args.mri_types))+f'_{args.model}.pth', model)
     model.to(DEVICE)
     model.eval()
 

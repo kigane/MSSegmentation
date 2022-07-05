@@ -6,7 +6,6 @@ notes: dummy
 # -------------------------model-------------------------------
 
 batch_size: 32
-model_data_type: flair
 mri_types: ["flair", t2]
 model: unet # unet | atten-unet
 num_epochs: 300 # total iteration steps

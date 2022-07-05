@@ -54,7 +54,7 @@ class MSMultiDataset(Dataset):
         for t in mri_types:
             self.mris[t] = np.load(os.path.join(
                 base_dir, t) + f"_{postfix}.npy")
-        self.mask = np.load(os.path.join(base_dir, t) +
+        self.mask = np.load(os.path.join(base_dir, 'mask') +
                             f"_{postfix}.npy").astype(np.float32)
         self.transform = transform
 
@@ -67,7 +67,6 @@ class MSMultiDataset(Dataset):
         imgs = []
         for mri in self.mris.values():
             imgs.append(self.transform(mri[index]))
-        print(self.mris.keys())
         img = torch.cat(imgs, dim=0)
         mask = tf.ToTensor()(self.mask[index])
         return img, mask
