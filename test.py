@@ -54,7 +54,7 @@ def test(args):
     # pd.concat([df_test.mean(), df_test.std()], axis=1).T.to_csv(
     #     'result/test_mean_std.csv')
     if args.use_wandb:
-        wandb.log({'Result': wandb.Table(dataframe=df_test.describe())})
+        wandb.log({'Result/test': wandb.Table(dataframe=df_test.describe())})
     else:
         print(df_test.describe())
 
@@ -72,14 +72,13 @@ def test(args):
     # pd.concat([df_train.mean(), df_train.std()], axis=1).T.to_csv(
     #     'result/train_mean_std.csv')
     if args.use_wandb:
-        wandb.log({'Result': wandb.Table(dataframe=df_train.describe())})
+        wandb.log({'Result/train': wandb.Table(dataframe=df_train.describe())})
     else:
         print(df_train.describe())
 
 
 if __name__ == '__main__':
     args = parse_args()
-    args.use_wandb = False
     print(args)
     test(args)
     # model = UNET(1, 1, [16, 32, 64, 128], [
