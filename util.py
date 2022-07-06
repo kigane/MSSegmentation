@@ -166,7 +166,7 @@ def get_avg_dice(preds, gts, threshold=0.5):
 
 def wb_mask(bg_img, pred_mask, true_mask):
     bg_img = bg_img.detach().cpu()[0].squeeze()
-    if bg_img.shape[0] > 2:
+    if bg_img.dim() > 2 and bg_img.shape[0] > 2:
         bg_img = bg_img[0]
     bg_img = bg_img.numpy()
     pred_mask = pred_mask.detach().cpu().numpy()[0].squeeze()
