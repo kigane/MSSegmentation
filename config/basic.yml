@@ -1,7 +1,7 @@
 use_wandb: true # if true, use wandb for recording
 project: MSSegmentation # wandb project name
 
-base_dir: ./data/isbi2015/
+base_dir: ./data/isbi2015raw/
 checkpoints: checkpoints
 num_workers: 8
 save_freq: 20

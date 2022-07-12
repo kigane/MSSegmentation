@@ -12,6 +12,7 @@ from torchvision.utils import make_grid
 import wandb
 from model import UNET, AttenUNET
 from model_maunet import MAUNET, MUNET, RMUNET
+from MaxViT import MaxViTUnet
 from UNeXt import UNext
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -196,6 +197,8 @@ def get_model(args):
                        args.dropout_ratios, use_bn=args.use_bn, act=args.activation)
     elif args.model == 'unext':
         model = UNext(1, len(args.mri_types))
+    elif args.model == 'maxvit-unet':
+        model = MaxViTUnet(len(args.mri_types))
     else:
         raise NotImplementedError(f'{args.model} is not implemented')
     return model

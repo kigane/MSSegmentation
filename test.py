@@ -8,6 +8,7 @@ import wandb
 from datasets import get_test_loader, get_loader
 import pandas as pd
 from torchvision.utils import make_grid
+import torchvision.transforms as tf
 import cv2 as cv
 
 from util import DEVICE, METRICS, calc_metrics, load_checkpoint, calc_metrics, get_avg_dice, parse_args, tensor2im, get_model
@@ -20,10 +21,13 @@ def test(args):
     model.to(DEVICE)
     model.eval()
 
+    trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((224, 224)), tf.ToTensor()])
+
     test_loader = get_test_loader(
         args.base_dir,
         args.mri_types,
         batch_size=1,
+        transform=trans
     )
 
     train_loader, _ = get_loader(
@@ -31,6 +35,7 @@ def test(args):
         args.mri_types,
         batch_size=1,
         num_workers=0,
+        transform=trans
     )
 
     metrics = []

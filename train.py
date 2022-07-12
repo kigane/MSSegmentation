@@ -3,6 +3,7 @@ import torch
 from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
+import torchvision.transforms as tf
 import wandb
 from losses import DiceBCELoss, FocalDiceBCELoss
 from datasets import get_loader
@@ -40,10 +41,13 @@ if __name__ == "__main__":
 
     model = get_model(args)
 
+    trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((224, 224)), tf.ToTensor()])
+
     train_loader, val_loader = get_loader(
         args.base_dir, args.mri_types,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
+        transform=trans,
         shuffle=True,
     )
 
