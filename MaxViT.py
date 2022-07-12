@@ -284,8 +284,8 @@ class MaxViTUpBlock(nn.Module):
 class MaxViTUnet(nn.Module):
     def __init__(
         self,
-        *,
         channels = 3,                   # 输入图片的通道数
+        *,
         features=[16, 32, 64, 128, 256],# 特征通道数
         dim_head = 16,                  # attention head的维度
         window_size = 7,                # G, P
