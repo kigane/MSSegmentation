@@ -2,18 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.transforms.functional as TF
-
-
-def get_activation(act):
-    if act == 'elu':
-        activation = nn.ELU()
-    elif act == 'relu':
-        activation = nn.ReLU()
-    elif act == 'lrelu':
-        activation = nn.LeakyReLU(0.1)
-    else:
-        raise NotImplementedError(f'{act} is not supported yet')
-    return activation
+from utils import get_activation
 
 
 class DoubleConv(nn.Module):
@@ -86,8 +75,7 @@ class UNET(nn.Module):
         super(UNET, self).__init__()
         self.ups = nn.ModuleList()
         self.downs = nn.ModuleList()
-        # self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.pool = nn.AvgPool2d(kernel_size=2, stride=2)
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
         dropouts = dropout_ratios[:4]
         bottleneck_p = dropout_ratios[-1]
 

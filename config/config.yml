@@ -7,7 +7,7 @@ notes: dummy
 
 batch_size: 32
 mri_types: ["flair"]
-model: maxvit-unet # unet | atten-unet | maxvit-unet
+model: hybridmv-unet # unet | atten-unet | maxvit-unet | hybridmv-unet
 mbconv_expansion_rate: 2 # used in maxvit-unet
 num_epochs: 300 # total iteration steps
 img_ch: 1 # The size of image channel
@@ -15,7 +15,7 @@ img_size: 224 # The size of image: H and W
 features: [16, 32, 64, 128] # dropout ratios ues in ups and downs
 dropout_ratios: [0.1, 0.1, 0.2, 0.2, 0.3] # dropout ratios ues in ups and downs
 use_bn: true
-activation: elu
+activation: relu
 
 # -------------------------optimizer---------------------------
 
