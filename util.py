@@ -198,7 +198,7 @@ def get_model(args):
     elif args.model == 'unext':
         model = UNext(1, len(args.mri_types))
     elif args.model == 'maxvit-unet':
-        model = MaxViTUnet(len(args.mri_types))
+        model = MaxViTUnet(len(args.mri_types), mbconv_expansion_rate=args.mbconv_expansion_rate)
     else:
         raise NotImplementedError(f'{args.model} is not implemented')
     return model

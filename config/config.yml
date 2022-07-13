@@ -8,6 +8,7 @@ notes: dummy
 batch_size: 32
 mri_types: ["flair"]
 model: maxvit-unet # unet | atten-unet | maxvit-unet
+mbconv_expansion_rate: 2 # used in maxvit-unet
 num_epochs: 300 # total iteration steps
 img_ch: 1 # The size of image channel
 img_size: 224 # The size of image: H and W
