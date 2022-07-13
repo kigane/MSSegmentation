@@ -10,10 +10,10 @@ from torchmetrics.functional import confusion_matrix
 from torchvision.utils import make_grid
 
 import wandb
-from model import UNET, AttenUNET
-from model_maunet import MAUNET, MUNET, RMUNET
-from MaxViT import MaxViTUnet
-from UNeXt import UNext
+from models.model import UNET, AttenUNET
+from models.model_maunet import MAUNET, MUNET, RMUNET
+from models.MaxViT import MaxViTUnet
+from models.UNeXt import UNext
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 METRICS = ['DSC', 'Sensitivity', 'Specificity', 'IOU',
