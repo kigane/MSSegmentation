@@ -86,7 +86,8 @@ class UNET(nn.Module):
         super(UNET, self).__init__()
         self.ups = nn.ModuleList()
         self.downs = nn.ModuleList()
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        # self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.pool = nn.AvgPool2d(kernel_size=2, stride=2)
         dropouts = dropout_ratios[:4]
         bottleneck_p = dropout_ratios[-1]
 
