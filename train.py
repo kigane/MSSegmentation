@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     model = get_model(args)
 
-    trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((224, 224)), tf.ToTensor()])
+    trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((args.img_size, args.img_size)), tf.ToTensor()])
 
     train_loader, val_loader = get_loader(
         args.base_dir, args.mri_types,
