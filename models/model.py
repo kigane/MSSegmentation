@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.transforms.functional as TF
-from utils import get_activation
+from models.utils import get_activation
 
 
 class DoubleConv(nn.Module):

@@ -45,17 +45,14 @@ class MSH5Datasets(Dataset):
 
     def __getitem__(self, idx):
         case = self.sample_list[idx]
-        if self.split == "train":
-            h5f = h5py.File(self._base_dir + "/data/{}.h5".format(case), "r")
-        else:
-            h5f = h5py.File(self._base_dir + "/data/{}.h5".format(case), "r")
+        h5f = h5py.File(self._base_dir + "/data/{}.h5".format(case), "r")
         # flair = h5f["flair"][:]
         # t2 = h5f["t2"][:]
         # mprage = h5f["mprage"][:]
         # pd = h5f["pd"][:]
         mask1 = h5f["mask1"][:]
         mask2 = h5f["mask2"][:]
-        image = torch.stack([torch.from_numpy(h5f[k][:]) for k in self.mri_types])
+        image = torch.stack([torch.from_numpy(h5f[t][:]) for t in self.mri_types])
         image = self.transform(image) if self.transform else image
         label = mask1 if self.use_mask1 else mask2
         label = self.transform(label.astype(np.float32)) if self.transform else tf.ToTensor()(label.astype(np.float32))
@@ -159,9 +156,10 @@ def get_test_loader(
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((224, 224)), tf.ToTensor(), tf.Normalize(0.5, 0.5)])
+    trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((224, 224)), tf.ToTensor()])
 
     d = MSH5Datasets("./data/isbi2015raw", "train",  ["flair", "t2", "pd"], trans)
+    # d = MSMultiDataset("./data/isbi2015", ["flair", "t2", "pd"])
 
     # t, v = get_loader('./data/isbi2015/flair_train.npy',
     #                   './data/isbi2015/mask_train.npy',
@@ -181,9 +179,9 @@ if __name__ == "__main__":
     # axes[0].imshow(data[0][3].permute(1, 2, 0), cmap='gray')
     # axes[1].imshow(data[1][3].permute(1, 2, 0), cmap='gray')
 
-    axes[0].imshow(d[24][0].permute(1, 2, 0)[:, :, 0], cmap="gray")
-    axes[1].imshow(d[24][0].permute(1, 2, 0)[:, :, 1], cmap="gray")
-    axes[2].imshow(d[24][0].permute(1, 2, 0)[:, :, 2], cmap="gray")
+    axes[0].imshow(d[42][0].permute(1, 2, 0)[:, :, 0], cmap="gray")
+    axes[1].imshow(d[42][0].permute(1, 2, 0)[:, :, 1], cmap="gray")
+    axes[2].imshow(d[42][0].permute(1, 2, 0)[:, :, 2], cmap="gray")
     # axes[3].imshow(d[24][0].permute(1, 2, 0)[:, :, 3], cmap='gray')
     # import seaborn as sns
     # sns.histplot(d[56][0].reshape(-1).numpy())
