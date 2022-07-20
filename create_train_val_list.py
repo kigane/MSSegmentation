@@ -13,9 +13,10 @@ def extract_casename(x):
 all_slices = sorted(glob.glob(BASE_DIR+'data/*.h5'))
 print(len(all_slices))
 # pprint(all_slices)
+test_case = '03_05'
 
-test_slices = [extract_casename(x) for x in all_slices if 'patient03_05' in x]
-train_slices = [extract_casename(x) for x in all_slices if 'patient03_05' not in x and 'patient' in x]
+test_slices = [extract_casename(x) for x in all_slices if f'patient{test_case}' in x]
+train_slices = [extract_casename(x) for x in all_slices if f'patient{test_case}' not in x and 'patient' in x]
 printlen(test_slices)
 printlen(train_slices)
 
@@ -27,12 +28,12 @@ printlen(train_slices)
 #         f.write(l)
 #         f.write('\n')
 
-with open('./data/isbi2015raw/train_slices_03_05.list', 'w') as f:
+with open(f'./data/isbi2015raw/train_slices_{test_case}.list', 'w') as f:
     for l in train_slices:
         f.write(l)
         f.write('\n')
 
-with open('./data/isbi2015raw/test_03_05.list', 'w') as f:
+with open(f'./data/isbi2015raw/test_{test_case}.list', 'w') as f:
     for l in test_slices:
         f.write(l)
         f.write('\n')

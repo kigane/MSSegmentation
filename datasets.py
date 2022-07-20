@@ -15,6 +15,7 @@ class MSH5Datasets(Dataset):
         split="train",
         mri_types=['flair'],
         transform=None,
+        test_case='03_05',
         use_mask1=True
     ):
         self._base_dir = base_dir
@@ -25,7 +26,7 @@ class MSH5Datasets(Dataset):
         self.use_mask1 = use_mask1
 
         if self.split == "train":
-            with open(self._base_dir + "/train_slices_03_05.list", "r") as f1:
+            with open(self._base_dir + f"/train_slices_{test_case}.list", "r") as f1:
                 tmp_list = f1.readlines()
             self.sample_list = [item.replace("\n", "") for item in tmp_list]
             # with open(self._base_dir + "/unlabeled_slices.list", "r") as f1:
@@ -33,7 +34,7 @@ class MSH5Datasets(Dataset):
             # self.sample_list += [item.replace("\n", "") for item in tmp_list]
 
         elif self.split == "val":
-            with open(self._base_dir + "/test_03_05.list", "r") as f:
+            with open(self._base_dir + f"/test_{test_case}.list", "r") as f:
                 self.sample_list = f.readlines()
             self.sample_list = [item.replace("\n", "") for item in self.sample_list]
         # if num is not None and self.split == "train":
@@ -127,10 +128,16 @@ class MSMultiDataset(Dataset):
 
 
 def get_loader(
-    base_dir, mri_types, batch_size=16, num_workers=0, shuffle=True, transform=None
+    base_dir, 
+    mri_types, 
+    batch_size=16, 
+    num_workers=0, 
+    shuffle=True, 
+    transform=None,
+    test_case='03_05'
 ):
     # dataset = MSMultiDataset(base_dir, mri_types, True, transform)
-    dataset = MSH5Datasets(base_dir, "train", mri_types, transform)
+    dataset = MSH5Datasets(base_dir, "train", mri_types, transform, test_case=test_case)
     train_len = int(len(dataset) * 0.8)
     train, val = random_split(dataset, [train_len, len(dataset) - train_len])
 
@@ -144,10 +151,16 @@ def get_loader(
 
 
 def get_test_loader(
-    base_dir, mri_types, batch_size=16, num_workers=0, shuffle=True, transform=None
+    base_dir, 
+    mri_types, 
+    batch_size=16, 
+    num_workers=0, 
+    shuffle=True, 
+    transform=None,
+    test_case='03_05'
 ):
     # dataset = MSMultiDataset(base_dir, mri_types, False, transform)
-    dataset = MSH5Datasets(base_dir, "val", mri_types, transform)
+    dataset = MSH5Datasets(base_dir, "val", mri_types, transform, test_case=test_case)
     return DataLoader(
         dataset, batch_size, shuffle=shuffle, num_workers=num_workers, pin_memory=True
     )

@@ -21,7 +21,7 @@ def test(args):
     model.to(DEVICE)
     model.eval()
 
-    trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((224, 224)), tf.ToTensor()])
+    trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((args.img_size, args.img_size)), tf.ToTensor()])
 
     test_loader = get_test_loader(
         args.base_dir,

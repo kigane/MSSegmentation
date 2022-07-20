@@ -1,13 +1,14 @@
 # -------------------------wandb-------------------------------
-group: MaxViT # a filter
+group: RBase # a filter
 # notes will show in wandb
 notes: dummy
+test_case: "03_05"
 
 # -------------------------model-------------------------------
 
 batch_size: 32
 mri_types: ["flair"]
-model: hybridmv-unet # unet | atten-unet | maxvit-unet | hybridmv-unet
+model: unet # unet | atten-unet | maxvit-unet | hybridmv-unet
 mbconv_expansion_rate: 2 # used in maxvit-unet
 num_epochs: 300 # total iteration steps
 img_ch: 1 # The size of image channel

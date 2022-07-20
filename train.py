@@ -51,6 +51,7 @@ if __name__ == "__main__":
         num_workers=args.num_workers,
         transform=trans,
         shuffle=True,
+        test_case=args.test_case
     )
 
     model.apply(init_weights)
