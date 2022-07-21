@@ -106,8 +106,8 @@ class MSH5Datasets(Dataset):
         label = mask1 if self.use_mask1 else mask2
         if self.transform:
             image, label = self.transform(image=image, mask=label)
-        else:
-            label = tf.ToTensor()(label.astype(np.float32))
+        image = tf.ToTensor()(image)
+        label = tf.ToTensor()(label.astype(np.float32))
         # sample = {"image": image, "label": label}
         # sample["idx"] = idx
         return image, label
