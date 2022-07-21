@@ -24,9 +24,9 @@ def test(args):
     model.eval()
 
     train_trans = A.Compose([
-        tf.ToPILImage(),
         A.CenterCrop(157, 157),
-        A.Resize(args.img_size, args.img_size)
+        A.Resize(args.img_size, args.img_size),
+        ToTensorV2()
     ])
 
     trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((args.img_size, args.img_size)), tf.ToTensor()])

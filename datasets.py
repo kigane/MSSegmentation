@@ -105,9 +105,10 @@ class MSH5Datasets(Dataset):
         image = torch.stack([torch.from_numpy(h5f[t][:]) for t in self.mri_types])
         label = mask1 if self.use_mask1 else mask2
         if self.transform:
-            image, label = self.transform(image=image, mask=label)
-        image = tf.ToTensor()(image)
-        label = tf.ToTensor()(label.astype(np.float32))
+            augmented = self.transform(image=image.permute(1, 2, 0).numpy(), mask=label)
+            image, label = augmented["image"], augmented["mask"]
+        else:
+            label = tf.ToTensor()(label.astype(np.float32))
         # sample = {"image": image, "label": label}
         # sample["idx"] = idx
         return image, label

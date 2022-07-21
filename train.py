@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     model = get_model(args)
 
-    trans = A.Compose([tf.ToPILImage(), A.CenterCrop(157, 157), A.Resize(args.img_size, args.img_size), A.HorizontalFlip()])
+    trans = A.Compose([A.CenterCrop(157, 157), A.Resize(args.img_size, args.img_size), A.HorizontalFlip(), ToTensorV2()])
 
     train_loader, val_loader = get_loader(
         args.base_dir, args.mri_types,
