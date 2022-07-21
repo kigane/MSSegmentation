@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as tf
 import albumentations as A
+from albumentations.pytorch import ToTensorV2
 import wandb
 from losses import DiceBCELoss, FocalDiceBCELoss
 from datasets import get_loader
@@ -44,7 +45,7 @@ if __name__ == "__main__":
 
     model = get_model(args)
 
-    trans = A.Compose([tf.ToPILImage(), A.CenterCrop(157, 157), A.Resize(args.img_size, args.img_size), A.HorizontalFlip(), tf.ToTensor()])
+    trans = A.Compose([tf.ToPILImage(), A.CenterCrop(157, 157), A.Resize(args.img_size, args.img_size), A.HorizontalFlip(), ToTensorV2()])
 
     train_loader, val_loader = get_loader(
         args.base_dir, args.mri_types,
