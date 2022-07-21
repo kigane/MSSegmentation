@@ -111,7 +111,9 @@ class MSH5Datasets(Dataset):
             label = tf.ToTensor()(label.astype(np.float32))
         # sample = {"image": image, "label": label}
         # sample["idx"] = idx
-        return image, label
+        if label.dim() == 2:
+            label = label.unsqueeze(0)
+        return image.float(), label.float()
 
 
 class MSDataset(Dataset):
