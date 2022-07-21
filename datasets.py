@@ -8,53 +8,6 @@ import numpy as np
 import torch
 import h5py
 
-import cv2
-
-def getVarianceMean(src, winSize):
-    if src is None or winSize is None:
-        print("The input parameters of getVarianceMean Function error")
-        return -1
-    
-    if winSize % 2 == 0:
-        print("The window size should be singular")
-        return -1 
-    
-    copyBorder_map=cv2.copyMakeBorder(src,winSize//2,winSize//2,winSize//2,winSize//2,cv2.BORDER_REPLICATE) # padding
-    shape=np.shape(src)
-    
-    local_mean=np.zeros_like(src)
-    local_std=np.zeros_like(src)
-    
-    for i in range(shape[0]):
-        for j in range(shape[1]):   
-            temp=copyBorder_map[i:i+winSize,j:j+winSize]
-            local_mean[i,j],local_std[i,j]=cv2.meanStdDev(temp)
-            if local_std[i,j]<=0:
-                local_std[i,j]=1e-8
-            
-    return local_mean,local_std
-    
-def ACE(src, winSize, maxCg): # 有一点用
-    """adaptContrastEnhancement"""
-    if src is None or winSize is None or maxCg is None:
-        print("The input parameters of ACE Function error")
-        return -1
-    shape=np.shape(src)
-    meansGlobal=cv2.mean(src)[0]
-    localMean_map, localStd_map=getVarianceMean(src,winSize)
-
-    for i in range(shape[0]):
-        for j in range(shape[1]):
-            cg = 0.2*meansGlobal/ localStd_map[i,j] # 增强系数
-            if cg >maxCg:
-                cg=maxCg
-            elif cg<1:
-                cg=1
-            temp = src[i,j].astype(float)
-            temp=max(0,min(localMean_map[i,j]+cg*(temp-localMean_map[i,j]),255))
-            src[i,j]=temp   
-    return src
-
 
 class MSH5Datasets(Dataset):
     def __init__(
@@ -77,16 +30,11 @@ class MSH5Datasets(Dataset):
             with open(self._base_dir + f"/train_slices_{test_case}.list", "r") as f1:
                 tmp_list = f1.readlines()
             self.sample_list = [item.replace("\n", "") for item in tmp_list]
-            # with open(self._base_dir + "/unlabeled_slices.list", "r") as f1:
-            #     tmp_list = f1.readlines()
-            # self.sample_list += [item.replace("\n", "") for item in tmp_list]
 
         elif self.split == "val":
             with open(self._base_dir + f"/test_{test_case}.list", "r") as f:
                 self.sample_list = f.readlines()
             self.sample_list = [item.replace("\n", "") for item in self.sample_list]
-        # if num is not None and self.split == "train":
-        #     self.sample_list = self.sample_list[:num]
         print("total {} samples".format(len(self.sample_list)))
 
     def __len__(self):
@@ -109,8 +57,6 @@ class MSH5Datasets(Dataset):
             image, label = augmented["image"], augmented["mask"]
         else:
             label = tf.ToTensor()(label.astype(np.float32))
-        # sample = {"image": image, "label": label}
-        # sample["idx"] = idx
         if label.dim() == 2:
             label = label.unsqueeze(0)
         return image.float(), label.float()
@@ -222,8 +168,9 @@ def get_test_loader(
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
+    from albumentations.pytorch import ToTensorV2
 
-    trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((224, 224)), tf.ToTensor()])
+    trans = A.Compose([A.CenterCrop(157, 157), A.Resize(224, 224), ToTensorV2()])
 
     d = MSH5Datasets("./data/isbi2015raw", "train",  ["flair", "t2", "pd"], trans)
     # d = MSMultiDataset("./data/isbi2015", ["flair", "t2", "pd"])

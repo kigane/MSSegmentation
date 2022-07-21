@@ -45,7 +45,13 @@ if __name__ == "__main__":
 
     model = get_model(args)
 
-    trans = A.Compose([A.CenterCrop(157, 157), A.Resize(args.img_size, args.img_size), A.HorizontalFlip(), ToTensorV2()])
+    # 输入图片已经归一化到[0, 1]了。
+    trans = A.Compose([
+        A.CenterCrop(157, 157), 
+        # A.Resize(args.img_size, args.img_size), 
+        A.RandomResizedCrop(args.img_size, args.img_size, scale=(0.8, 1), ratio=(1, 1)),
+        A.HorizontalFlip(), 
+        ToTensorV2()])
 
     train_loader, val_loader = get_loader(
         args.base_dir, args.mri_types,
