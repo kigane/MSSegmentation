@@ -10,6 +10,7 @@ import pandas as pd
 from torchvision.utils import make_grid
 import torchvision.transforms as tf
 import albumentations as A
+from albumentations.pytorch import ToTensorV2
 import cv2 as cv
 
 from util import DEVICE, METRICS, calc_metrics, load_checkpoint, calc_metrics, get_avg_dice, parse_args, tensor2im, get_model
@@ -26,7 +27,7 @@ def test(args):
         tf.ToPILImage(),
         A.CenterCrop(157, 157),
         A.Resize(args.img_size, args.img_size),
-        tf.ToTensor()
+        ToTensorV2()
     ])
 
     trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((args.img_size, args.img_size)), tf.ToTensor()])
