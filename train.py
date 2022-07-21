@@ -4,6 +4,7 @@ from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as tf
+import albumentations as A
 import wandb
 from losses import DiceBCELoss, FocalDiceBCELoss
 from datasets import get_loader
@@ -43,7 +44,7 @@ if __name__ == "__main__":
 
     model = get_model(args)
 
-    trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((args.img_size, args.img_size)), tf.ToTensor()])
+    trans = A.Compose([tf.ToPILImage(), A.CenterCrop(157, 157), A.Resize(args.img_size, args.img_size), A.HorizontalFlip(), tf.ToTensor()])
 
     train_loader, val_loader = get_loader(
         args.base_dir, args.mri_types,

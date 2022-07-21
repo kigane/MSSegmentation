@@ -9,6 +9,7 @@ from datasets import get_test_loader, get_loader
 import pandas as pd
 from torchvision.utils import make_grid
 import torchvision.transforms as tf
+import albumentations as A
 import cv2 as cv
 
 from util import DEVICE, METRICS, calc_metrics, load_checkpoint, calc_metrics, get_avg_dice, parse_args, tensor2im, get_model
@@ -20,6 +21,13 @@ def test(args):
         args.checkpoints, '_'.join(args.mri_types))+f'_{args.model}.pth', model)
     model.to(DEVICE)
     model.eval()
+
+    train_trans = A.Compose([
+        tf.ToPILImage(),
+        A.CenterCrop(157, 157),
+        A.Resize(args.img_size, args.img_size),
+        tf.ToTensor()
+    ])
 
     trans = tf.Compose([tf.ToPILImage(), tf.CenterCrop((157, 157)), tf.Resize((args.img_size, args.img_size)), tf.ToTensor()])
 
@@ -35,7 +43,7 @@ def test(args):
         args.mri_types,
         batch_size=1,
         num_workers=0,
-        transform=trans
+        transform=train_trans
     )
 
     metrics = []

@@ -3,6 +3,7 @@ import os
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader, random_split
 import torchvision.transforms as tf
+import albumentations as A
 import numpy as np
 import torch
 import h5py
@@ -33,7 +34,7 @@ def getVarianceMean(src, winSize):
             
     return local_mean,local_std
     
-def ACE(src, winSize, maxCg):
+def ACE(src, winSize, maxCg): # 有一点用
     """adaptContrastEnhancement"""
     if src is None or winSize is None or maxCg is None:
         print("The input parameters of ACE Function error")
@@ -101,10 +102,12 @@ class MSH5Datasets(Dataset):
         mask1 = h5f["mask1"][:]
         mask2 = h5f["mask2"][:]
         
-        image = torch.stack([torch.from_numpy(ACE(h5f[t][:], 9, 5)) for t in self.mri_types])
-        image = self.transform(image) if self.transform else image
+        image = torch.stack([torch.from_numpy(h5f[t][:]) for t in self.mri_types])
         label = mask1 if self.use_mask1 else mask2
-        label = self.transform(label.astype(np.float32)) if self.transform else tf.ToTensor()(label.astype(np.float32))
+        if self.transform:
+            image, label = self.transform(image=image, mask=label)
+        else:
+            label = tf.ToTensor()(label.astype(np.float32))
         # sample = {"image": image, "label": label}
         # sample["idx"] = idx
         return image, label
