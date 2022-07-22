@@ -7,6 +7,7 @@ import numpy as np
 import SimpleITK as sitk
 from matplotlib import pyplot as plt
 import cv2
+from tqdm import tqdm
 
 
 def getVarianceMean(src, winSize):
@@ -86,7 +87,7 @@ def process_isbi(isTrain=True):
         
     # 读取nii，将mri_sequence和相应的mask保存到一个h5文件中。
     # for flair, t2, mprage, pd, mask1, mask2 in zip(*mri_seq_paths_dict.values()):
-    for mris in zip(*mri_seq_paths_dict.values()):
+    for mris in tqdm(zip(*mri_seq_paths_dict.values())):
         imgs_3d = [read_nii(path) for path in mris]
         # case: 'patient0x_0x'
         case = os.path.split(mris[0])[1].split('_flair')[0].replace('training', 'patient')
@@ -107,15 +108,14 @@ def process_isbi(isTrain=True):
         
         # 将mri和相应mask存到一个h5文件中
         slice_ind = 0
-        for imgs in zip(*filtered_imgs):
+        for imgs in tqdm(zip(*filtered_imgs)):
             # dir = 'train' if isTrain else 'test'
             f = h5py.File(f'./data/isbi2015ace/data/{case}_slice_{str(slice_ind).zfill(3)}.h5', 'w')
-            imgs = [ACE(normalize(img)*255, 7, 9) for img in imgs] # [0,255]
             # imgs = [normalize(img)*255 for img in imgs] # [0,255]
-            f.create_dataset('flair', data=imgs[0], compression="gzip")
-            f.create_dataset('t2', data=imgs[1], compression="gzip")
-            f.create_dataset('mprage', data=imgs[2], compression="gzip")
-            f.create_dataset('pd', data=imgs[3], compression="gzip")
+            f.create_dataset('flair', data=ACE(normalize(imgs[0])*255, 7, 9), compression="gzip")
+            f.create_dataset('t2', data=ACE(normalize(imgs[1])*255, 7, 9), compression="gzip")
+            f.create_dataset('mprage', data=ACE(normalize(imgs[2])*255, 7, 9), compression="gzip")
+            f.create_dataset('pd', data=ACE(normalize(imgs[3])*255, 7, 9), compression="gzip")
             if isTrain:
                 f.create_dataset('mask1', data=imgs[4].astype(np.uint8), compression="gzip")
                 f.create_dataset('mask2', data=imgs[5].astype(np.uint8), compression="gzip")

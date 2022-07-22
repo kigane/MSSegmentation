@@ -52,8 +52,8 @@ if __name__ == "__main__":
     # 输入图片已经归一化到[0, 1]了。
     trans = A.Compose([
         A.CenterCrop(157, 157), 
-        # A.Resize(args.img_size, args.img_size), 
-        A.RandomResizedCrop(args.img_size, args.img_size, scale=(0.8, 1), ratio=(1, 1)),
+        A.Resize(args.img_size, args.img_size), 
+        # A.RandomResizedCrop(args.img_size, args.img_size, scale=(0.8, 1), ratio=(1, 1)),
         A.HorizontalFlip(), 
         ToTensorV2()])
 
