@@ -20,6 +20,10 @@ def get_scheduler(optimizer, num_batches, args):
     elif args.lr_policy == 'cosine':
         scheduler = optim.lr_scheduler.CosineAnnealingLR(
             optimizer, T_max=num_batches * args.num_epochs, eta_min=1e-6)
+    elif args.lr_policy == 'poly':
+        # lr = lr * lambda(step)
+        scheduler = optim.lr_scheduler.LambdaLR(
+            optimizer, lambda s:(1-s/num_batches * args.num_epochs)**2)
     else:
         scheduler = None
     return scheduler
