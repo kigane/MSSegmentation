@@ -6,6 +6,54 @@ import h5py
 import numpy as np
 import SimpleITK as sitk
 from matplotlib import pyplot as plt
+import cv2
+
+
+def getVarianceMean(src, winSize):
+    if src is None or winSize is None:
+        print("The input parameters of getVarianceMean Function error")
+        return -1
+    
+    if winSize % 2 == 0:
+        print("The window size should be singular")
+        return -1 
+    
+    copyBorder_map=cv2.copyMakeBorder(src,winSize//2,winSize//2,winSize//2,winSize//2,cv2.BORDER_REPLICATE) # padding
+    shape=np.shape(src)
+    
+    local_mean=np.zeros_like(src)
+    local_std=np.zeros_like(src)
+    
+    for i in range(shape[0]):
+        for j in range(shape[1]):   
+            temp=copyBorder_map[i:i+winSize,j:j+winSize]
+            local_mean[i,j],local_std[i,j]=cv2.meanStdDev(temp)
+            if local_std[i,j]<=0:
+                local_std[i,j]=1e-8
+            
+    return local_mean,local_std
+    
+
+def ACE(src, winSize, maxCg): # 有一点用
+    """adaptContrastEnhancement"""
+    if src is None or winSize is None or maxCg is None:
+        print("The input parameters of ACE Function error")
+        return -1
+    shape=np.shape(src)
+    meansGlobal=cv2.mean(src)[0]
+    localMean_map, localStd_map=getVarianceMean(src,winSize)
+
+    for i in range(shape[0]):
+        for j in range(shape[1]):
+            cg = 0.2*meansGlobal/ localStd_map[i,j] # 增强系数
+            if cg >maxCg:
+                cg=maxCg
+            elif cg<1:
+                cg=1
+            temp = src[i,j].astype(float)
+            temp=max(0,min(localMean_map[i,j]+cg*(temp-localMean_map[i,j]),255))
+            src[i,j]=temp   
+    return src
 
 
 def read_nii(path) -> np.ndarray:
@@ -60,12 +108,14 @@ def process_isbi(isTrain=True):
         # 将mri和相应mask存到一个h5文件中
         slice_ind = 0
         for imgs in zip(*filtered_imgs):
-            dir = 'train' if isTrain else 'test'
-            f = h5py.File(f'./data/isbi2015raw/{dir}/{case}_slice_{str(slice_ind).zfill(3)}.h5', 'w')
-            f.create_dataset('flair', data=normalize(imgs[0]), compression="gzip")
-            f.create_dataset('t2', data=normalize(imgs[1]), compression="gzip")
-            f.create_dataset('mprage', data=normalize(imgs[2]), compression="gzip")
-            f.create_dataset('pd', data=normalize(imgs[3]), compression="gzip")
+            # dir = 'train' if isTrain else 'test'
+            f = h5py.File(f'./data/isbi2015ace/data/{case}_slice_{str(slice_ind).zfill(3)}.h5', 'w')
+            imgs = [ACE(normalize(img)*255, 7, 9) for img in imgs] # [0,255]
+            # imgs = [normalize(img)*255 for img in imgs] # [0,255]
+            f.create_dataset('flair', data=imgs[0], compression="gzip")
+            f.create_dataset('t2', data=imgs[1], compression="gzip")
+            f.create_dataset('mprage', data=imgs[2], compression="gzip")
+            f.create_dataset('pd', data=imgs[3], compression="gzip")
             if isTrain:
                 f.create_dataset('mask1', data=imgs[4].astype(np.uint8), compression="gzip")
                 f.create_dataset('mask2', data=imgs[5].astype(np.uint8), compression="gzip")
@@ -77,13 +127,13 @@ def process_isbi(isTrain=True):
 
 
 if __name__ == '__main__':
-    process_isbi(isTrain=False)
+    process_isbi(isTrain=True)
     # imgs = read_nii(r'data\training\training01\preprocessed\training01_01_flair_pp.nii')
     # print(imgs.max())
     # print(imgs.mean())
     exit()
-    # f = h5py.File('./data/isbi2015raw/train/patient01_01_slice_001.h5', 'r')
-    # f = h5py.File('./data/isbi2015raw/test/test01_01_slice_0.h5', 'r')
+    f = h5py.File('./data/isbi2015raw/data/patient01_01_slice_001.h5', 'r')
+    f = h5py.File('./data/isbi2015raw/data/test01_01_slice_001.h5', 'r')
     img_arrs = [
         f['flair'][:],
         f['t2'][:],
