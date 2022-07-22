@@ -26,10 +26,15 @@ def test(args):
     train_trans = A.Compose([
         A.CenterCrop(157, 157),
         A.Resize(args.img_size, args.img_size),
+        A.Normalize(0, 1, max_pixel_value=255),
         ToTensorV2()
     ])
 
-    trans = A.Compose([A.CenterCrop(157, 157), A.Resize(args.img_size, args.img_size), ToTensorV2()])
+    trans = A.Compose([
+        A.CenterCrop(157, 157), 
+        A.Resize(args.img_size, args.img_size), 
+        A.Normalize(0, 1, max_pixel_value=255),
+        ToTensorV2()])
 
     test_loader = get_test_loader(
         args.base_dir,

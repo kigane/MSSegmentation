@@ -1,8 +1,8 @@
 # -------------------------wandb-------------------------------
 group: RBase # a filter
 # notes will show in wandb
-notes: dummy
-test_case: "03_05"
+notes: add horizontal flip & ACE
+test_case: "01_01"
 
 # -------------------------model-------------------------------
 
