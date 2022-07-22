@@ -7,8 +7,8 @@ from einops import rearrange, repeat
 from einops.layers.torch import Rearrange, Reduce
 
 import torch.nn.functional as F
-from MaxViT import MaxViTBlock, MBConvResidual
-from utils import get_activation
+from models.MaxViT import MaxViTBlock, MBConvResidual
+from models.utils import get_activation
 
 
 class DoubleConv(nn.Module):
