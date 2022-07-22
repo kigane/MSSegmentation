@@ -52,6 +52,8 @@ class MSH5Datasets(Dataset):
         
         image = torch.stack([torch.from_numpy(h5f[t][:]) for t in self.mri_types])
         label = mask1 if self.use_mask1 else mask2
+        
+        add_ch = False
         if image.shape[0] == 2: # 用两种模态时先添加一个通道，便于做变换
             image = torch.cat([image, torch.zeros([1]+list(image.shape[1:]))])
             add_ch = True
@@ -177,7 +179,7 @@ if __name__ == "__main__":
 
     trans = A.Compose([A.CenterCrop(157, 157), A.Resize(224, 224), ToTensorV2()])
 
-    d = MSH5Datasets("./data/isbi2015raw", "train",  ["flair", "t2"], trans)
+    d = MSH5Datasets("./data/isbi2015ace", "train",  ["flair", "t2"], trans)
     # d = MSMultiDataset("./data/isbi2015", ["flair", "t2", "pd"])
 
     # t, v = get_loader('./data/isbi2015/flair_train.npy',
