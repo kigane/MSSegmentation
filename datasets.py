@@ -52,6 +52,9 @@ class MSH5Datasets(Dataset):
         
         image = torch.stack([torch.from_numpy(h5f[t][:]) for t in self.mri_types])
         label = mask1 if self.use_mask1 else mask2
+        if image.shape[0] == 2: # 用两种模态时先添加一个通道，便于做变换
+            image = torch.cat([image, torch.zeros([1]+list(image.shape[1:]))])
+            add_ch = True
         if self.transform:
             augmented = self.transform(image=image.permute(1, 2, 0).numpy(), mask=label)
             image, label = augmented["image"], augmented["mask"]
@@ -59,6 +62,8 @@ class MSH5Datasets(Dataset):
             label = tf.ToTensor()(label.astype(np.float32))
         if label.dim() == 2:
             label = label.unsqueeze(0)
+        if add_ch:
+            image = image[:2]
         return image.float(), label.float()
 
 
@@ -172,7 +177,7 @@ if __name__ == "__main__":
 
     trans = A.Compose([A.CenterCrop(157, 157), A.Resize(224, 224), ToTensorV2()])
 
-    d = MSH5Datasets("./data/isbi2015raw", "train",  ["flair", "t2", "pd"], trans)
+    d = MSH5Datasets("./data/isbi2015raw", "train",  ["flair", "t2"], trans)
     # d = MSMultiDataset("./data/isbi2015", ["flair", "t2", "pd"])
 
     # t, v = get_loader('./data/isbi2015/flair_train.npy',
@@ -195,7 +200,7 @@ if __name__ == "__main__":
 
     axes[0].imshow(d[42][0].permute(1, 2, 0)[:, :, 0], cmap="gray")
     axes[1].imshow(d[42][0].permute(1, 2, 0)[:, :, 1], cmap="gray")
-    axes[2].imshow(d[42][0].permute(1, 2, 0)[:, :, 2], cmap="gray")
+    # axes[2].imshow(d[42][0].permute(1, 2, 0)[:, :, 2], cmap="gray")
     # axes[3].imshow(d[24][0].permute(1, 2, 0)[:, :, 3], cmap='gray')
     # import seaborn as sns
     # sns.histplot(d[56][0].reshape(-1).numpy())
