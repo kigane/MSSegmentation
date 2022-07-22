@@ -7,9 +7,8 @@ from einops import rearrange, repeat
 from einops.layers.torch import Rearrange, Reduce
 
 import torch.nn.functional as F
-
-from models.MaxViT import MaxViTBlock, MBConvResidual
-from models.utils import get_activation
+from MaxViT import MaxViTBlock, MBConvResidual
+from utils import get_activation
 
 
 class DoubleConv(nn.Module):
@@ -80,19 +79,19 @@ class HybridMVUnet(nn.Module):
         self.pool = nn.MaxPool2d(2, 2)
 
         self.max_encoder = MaxViTBlock(features[2], features[3], downsample=False, 
-                    dim_head=16, dropout=dropout, window_size=window_size,
+                    dim_head=dim_head, dropout=dropout, window_size=window_size,
                     mbconv_expansion_rate=mbconv_expansion_rate,
                     mbconv_shrinkage_rate=mbconv_shrinkage_rate) # 28
 
         self.max_bottlenect = MaxViTBlock(features[3], features[4], downsample=False, 
-                    dim_head=16, dropout=dropout, window_size=window_size,
+                    dim_head=dim_head, dropout=dropout, window_size=window_size,
                     mbconv_expansion_rate=mbconv_expansion_rate,
                     mbconv_shrinkage_rate=mbconv_shrinkage_rate) # 14    
 
-        self.down_ch = nn.Conv2d(features[4], features[3], 3, 1, 1, bias=False)
+        self.down_ch = nn.Conv2d(features[4], features[3], 1, 1, 1, bias=False)
 
         self.max_decoder = MaxViTBlock(features[4], features[3], downsample=False, 
-                    dim_head=16, dropout=dropout, window_size=window_size,
+                    dim_head=dim_head, dropout=dropout, window_size=window_size,
                     mbconv_expansion_rate=mbconv_expansion_rate,
                     mbconv_shrinkage_rate=mbconv_shrinkage_rate) # 28
 
