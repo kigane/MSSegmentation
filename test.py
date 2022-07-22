@@ -68,6 +68,7 @@ def test(args):
     #     'result/test_mean_std.csv')
     if args.use_wandb:
         wandb.log({'Result/test': wandb.Table(dataframe=df_test.describe())})
+        print(df_test.describe())
     else:
         print(df_test.describe())
 
@@ -86,6 +87,7 @@ def test(args):
     #     'result/train_mean_std.csv')
     if args.use_wandb:
         wandb.log({'Result/train': wandb.Table(dataframe=df_train.describe())})
+        print(df_train.describe())
     else:
         print(df_train.describe())
 
