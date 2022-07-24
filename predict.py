@@ -2,21 +2,23 @@ import glob
 import os
 from collections import OrderedDict
 
+import albumentations as A
+import cv2 as cv
 import h5py
-from nbformat import read
 import numpy as np
 import SimpleITK as sitk
-from matplotlib import pyplot as plt
 import torch
 import torch.nn as nn
-
+import torch.nn.functional as F
 import torchvision.transforms as tf
-import albumentations as A
 from albumentations.pytorch import ToTensorV2
-import cv2 as cv
+from matplotlib import pyplot as plt
+from nbformat import read
 from tqdm import tqdm
 
-from util import DEVICE, METRICS, calc_metrics, load_checkpoint, calc_metrics, get_avg_dice, parse_args, tensor2im, get_model
+from util import (DEVICE, METRICS, calc_metrics, get_avg_dice, get_model,
+                  load_checkpoint, parse_args, tensor2im)
+
 
 def getVarianceMean(src, winSize):
     if src is None or winSize is None:
@@ -76,28 +78,28 @@ def normalize(images):
     for i in tqdm(range(images.shape[0])):
         image = images[i]
         image = (image - image.min()) / (image.max() - image.min() + 1e-8) * 255.0
-        # image = ACE(image, 7, 9)
+        image = ACE(image, 7, 9)
         images[i] = image
     return images
 
 def predict_one_nii(model, nii_path, transform, args):
     imgs = normalize(read_nii(nii_path)) # 181x217x181
     preds = torch.empty(imgs.shape)
-    tf_resize = tf.Resize(imgs.shape[1:])
+    tf_resize = tf.Resize((157, 157))
     with torch.no_grad():
         for i in tqdm(range(imgs.shape[0])):
-            print(imgs[i].shape)
+            # print(imgs[i].shape) # 217x181
             img = transform(image=imgs[i])["image"]
-            print(img.shape)
-            if i == 68:
-                plt.imshow(img[0].numpy(), cmap='gray')
-                plt.show()
+            # print(img.shape) # 1x224x224
+            # if i == 68:
+            #     plt.imshow(img[0].numpy(), cmap='gray')
+            #     plt.show()
             img = img.unsqueeze(0)
-            pred = model(img)
-            if i == 68:
-                plt.imshow(pred.squeeze().detach().numpy(), cmap='gray')
-                plt.show()
-            preds[i] = tf_resize(pred).squeeze()
+            pred = model(img.to(DEVICE))
+            # if i == 68:
+            #     plt.imshow(pred.squeeze().cpu().detach().numpy(), cmap='gray')
+            #     plt.show()
+            preds[i] = F.pad(tf_resize(pred).squeeze(), [12, 12, 30, 30])
     preds = (preds > 0.5).float()
     preds = preds.detach().cpu().numpy()
     
