@@ -60,7 +60,7 @@ if __name__ == "__main__":
         A.HorizontalFlip(), 
         ToTensorV2()
     ])
-    trans = A.Compose(*trans_lst)
+    trans = A.Compose(trans_lst)
 
     train_loader, val_loader = get_loader(
         args.base_dir, args.mri_types,
