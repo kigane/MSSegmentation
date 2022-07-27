@@ -3,9 +3,9 @@ test_case: "01_01"
 dataset: bra # ms | bra
 
 # -------------------------wandb-------------------------------
-group: RBase # a filter
+group: BraBase # a filter
 # notes will show in wandb
-notes: add horizontal flip & ACE
+notes: BraTS
 # -------------------------model-------------------------------
 
 batch_size: 32

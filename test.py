@@ -32,9 +32,9 @@ def test(args):
         ToTensorV2()
     ])
 
-    train_trans = A.Compose(*trans_lst)
+    train_trans = A.Compose(trans_lst)
 
-    trans = A.Compose([*trans_lst])
+    trans = A.Compose(trans_lst)
 
     test_loader = get_test_loader(
         args.base_dir,
