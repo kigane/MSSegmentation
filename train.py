@@ -116,7 +116,7 @@ if __name__ == "__main__":
                 "optimizer": optimizer.state_dict(),
             }
             save_checkpoint(checkpoint, os.path.join(
-                args.checkpoints, '_'.join(args.mri_types))+f'_{args.model}.pth')
+                args.checkpoints, '_'.join(args.mri_types))+f'_{args.model}_{args.dataset}.pth')
 
         # check accuracy
         acc, dice = check_accuracy(val_loader, model, device=DEVICE)
