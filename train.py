@@ -50,13 +50,17 @@ if __name__ == "__main__":
     model = get_model(args)
 
     # raw输入图片已经归一化到[0, 1]了。
-    trans = A.Compose([
-        A.CenterCrop(157, 157), 
+    trans_lst = []
+    if args.dataset == 'ms':
+        trans_lst.append(A.CenterCrop(157, 157))
+    trans_lst.extend([
         A.Resize(args.img_size, args.img_size), 
         # A.RandomResizedCrop(args.img_size, args.img_size, scale=(0.8, 1), ratio=(1, 1)),
         A.Normalize(0, 1, max_pixel_value=255),
         A.HorizontalFlip(), 
-        ToTensorV2()])
+        ToTensorV2()
+    ])
+    trans = A.Compose(*trans_lst)
 
     train_loader, val_loader = get_loader(
         args.base_dir, args.mri_types,
@@ -64,7 +68,8 @@ if __name__ == "__main__":
         num_workers=args.num_workers,
         transform=trans,
         shuffle=True,
-        test_case=args.test_case
+        test_case=args.test_case,
+        ds_type=args.dataset
     )
 
     model.apply(init_weights)

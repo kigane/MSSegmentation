@@ -1,9 +1,11 @@
+base_dir: ./data/BraTS2019/
+test_case: "01_01"
+dataset: bra # ms | bra
+
 # -------------------------wandb-------------------------------
 group: RBase # a filter
 # notes will show in wandb
 notes: add horizontal flip & ACE
-test_case: "01_01"
-
 # -------------------------model-------------------------------
 
 batch_size: 32
@@ -17,7 +19,7 @@ features: [16, 32, 64, 128] # dropout ratios ues in ups and downs
 dropout_ratios: [0.1, 0.1, 0.2, 0.2, 0.3] # dropout ratios ues in ups and downs
 dropout: 0.3 # used in MaxViT
 use_bn: true
-activation: relu
+activation: elu
 
 # -------------------------optimizer---------------------------
 
