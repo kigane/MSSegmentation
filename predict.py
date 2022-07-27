@@ -13,7 +13,6 @@ import torch.nn.functional as F
 import torchvision.transforms as tf
 from albumentations.pytorch import ToTensorV2
 from matplotlib import pyplot as plt
-from nbformat import read
 from tqdm import tqdm
 
 from util import (DEVICE, METRICS, calc_metrics, get_avg_dice, get_model,
