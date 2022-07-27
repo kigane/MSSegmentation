@@ -56,7 +56,7 @@ if __name__ == "__main__":
     trans_lst.extend([
         A.Resize(args.img_size, args.img_size), 
         # A.RandomResizedCrop(args.img_size, args.img_size, scale=(0.8, 1), ratio=(1, 1)),
-        A.Normalize(0, 1, max_pixel_value=255),
+        # A.Normalize(0, 1, max_pixel_value=255),
         A.HorizontalFlip(), 
         ToTensorV2()
     ])

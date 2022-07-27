@@ -28,7 +28,7 @@ def test(args):
         trans_lst.append(A.CenterCrop(157, 157))
     trans_lst.extend([
         A.Resize(args.img_size, args.img_size), 
-        A.Normalize(0, 1, max_pixel_value=255),
+        # A.Normalize(0, 1, max_pixel_value=255),
         ToTensorV2()
     ])
 
