@@ -69,6 +69,49 @@ class MSH5Datasets(Dataset):
         return image.float(), label.float()
 
 
+class BraTSDatasets(Dataset):
+    def __init__(
+        self,
+        base_dir=None,
+        split="train",
+        transform=None,
+    ):
+        self._base_dir = base_dir
+        self.sample_list = []
+        self.split = split
+        self.transform = transform
+
+        if self.split == "train":
+            with open(self._base_dir + f"train_slices.list", "r") as f1:
+                tmp_list = f1.readlines()
+            self.sample_list = [item.replace("\n", "") for item in tmp_list]
+
+        elif self.split == "val":
+            with open(self._base_dir + f"val_slices.list", "r") as f:
+                self.sample_list = f.readlines()
+            self.sample_list = [item.replace("\n", "") for item in self.sample_list]
+        print("total {} samples".format(len(self.sample_list)))
+
+    def __len__(self):
+        return len(self.sample_list)
+
+    def __getitem__(self, idx):
+        case = self.sample_list[idx]
+        h5f = h5py.File(self._base_dir + "data/{}_slices/{}".format(self.split ,case), "r")
+
+        image = torch.from_numpy(h5f["image"][:]).unsqueeze(0)
+        label = h5f["label"][:].astype(np.int32)
+        
+        if self.transform:
+            augmented = self.transform(image=image.permute(1, 2, 0).numpy(), mask=label)
+            image, label = augmented["image"], augmented["mask"]
+        else:
+            label = tf.ToTensor()(label.astype(np.float32))
+        if label.dim() == 2:
+            label = label.unsqueeze(0)
+        return image.float(), label.float()
+
+
 class MSDataset(Dataset):
     # path 为 npy 文件的位置
     def __init__(self, mri_path, mask_path, transform=None):
@@ -141,10 +184,16 @@ def get_loader(
     num_workers=0, 
     shuffle=True, 
     transform=None,
-    test_case='03_05'
+    test_case='03_05',
+    ds_type='ms'
 ):
+    if ds_type == 'ms':
     # dataset = MSMultiDataset(base_dir, mri_types, True, transform)
-    dataset = MSH5Datasets(base_dir, "train", mri_types, transform, test_case=test_case)
+        dataset = MSH5Datasets(base_dir, "train", mri_types, transform, test_case=test_case)
+    elif ds_type == 'bra':
+        dataset = BraTSDatasets(base_dir, 'train', transform)
+    else:
+        raise NotImplementedError(f'{ds_type} is not supported')
     train_len = int(len(dataset) * 0.8)
     train, val = random_split(dataset, [train_len, len(dataset) - train_len])
 
@@ -164,10 +213,16 @@ def get_test_loader(
     num_workers=0, 
     shuffle=True, 
     transform=None,
-    test_case='03_05'
+    test_case='03_05',
+    ds_type='ms'
 ):
-    # dataset = MSMultiDataset(base_dir, mri_types, False, transform)
-    dataset = MSH5Datasets(base_dir, "val", mri_types, transform, test_case=test_case)
+    if ds_type == 'ms':
+    # dataset = MSMultiDataset(base_dir, mri_types, True, transform)
+        dataset = MSH5Datasets(base_dir, "val", mri_types, transform, test_case=test_case)
+    elif ds_type == 'bra':
+        dataset = BraTSDatasets(base_dir, 'val', transform)
+    else:
+        raise NotImplementedError(f'{ds_type} is not supported')
     return DataLoader(
         dataset, batch_size, shuffle=shuffle, num_workers=num_workers, pin_memory=True
     )
