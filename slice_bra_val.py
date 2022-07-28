@@ -1,5 +1,6 @@
 from util import *
 from h5py import File
+from tqdm import tqdm
 
 def normalize(image):
     image = (image - image.min()) / (image.max() - image.min() + 1e-8)
@@ -12,7 +13,7 @@ val_cases = [item.replace("\n", "") for item in tmp_list]
 os.makedirs('data/BraTS2019/data/val_slices', exist_ok=True)
 
 root = 'data/BraTS2019/data/'
-for case in val_cases:
+for case in tqdm(val_cases):
     path = os.path.join(root, case)
     assert os.path.exists(path), f'{path} not exists!'
     f = File(path, 'r')
