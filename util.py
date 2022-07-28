@@ -12,7 +12,7 @@ from torchvision.utils import make_grid
 import wandb
 from models.model import UNET, AttenUNET
 from models.model_maunet import MAUNET, MUNET, RMUNET
-from models.MaxViT import MaxViTUnet
+from models.MaxViT import MaxViTUnet, MaxViTSkipUnet
 from models.UNeXt import UNext
 from models.HybridMaxVitUnet import HybridMVUnet
 
@@ -200,6 +200,8 @@ def get_model(args):
         model = UNext(1, len(args.mri_types))
     elif args.model == 'maxvit-unet':
         model = MaxViTUnet(len(args.mri_types), mbconv_expansion_rate=args.mbconv_expansion_rate, dropout=args.dropout)
+    elif args.model == 'maxvit-skip-unet':
+        model = MaxViTSkipUnet(len(args.mri_types), mbconv_expansion_rate=args.mbconv_expansion_rate, dropout=args.dropout)
     elif args.model == 'hybridmv-unet':
         model = HybridMVUnet(len(args.mri_types), out_channels=1,  mbconv_expansion_rate=args.mbconv_expansion_rate)
     else:
